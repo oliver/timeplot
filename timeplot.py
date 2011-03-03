@@ -103,7 +103,7 @@ class SdlOutput(BaseOutput):
                     t = e[0]
                     value = e[1]
                     x = (t - start) * factorX
-                    y = (value - yMin) * factorY
+                    y = height - ((value - yMin) * factorY)
                     points.append( (x,y) )
                 if len(points) > 1:
                     pygame.draw.lines(self.screen, (255,255,255), False, points)
