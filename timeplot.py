@@ -54,7 +54,7 @@ class SdlOutput(BaseOutput):
 
             # TODO: timer resolution is now tied to the Hz value here;
             # it might be better if timers and fd watchers are independent of any static update rate.
-            timePassed = self.clock.tick(120)
+            timePassed = self.clock.tick(30)
             
             for event in pygame.event.get():
                 #print event
