@@ -103,12 +103,8 @@ class SdlOutput(BaseOutput):
 
             self.screen.fill( (0, 0, 0) )
 
-            (availStart, availEnd) = self.store.getRange()
-            self.scrollbar.setRange(availStart, availEnd)
-
-
+            nowTime = time.time()
             if self.update:
-                nowTime = time.time()
                 end = nowTime
                 start = end - self.displayedSeconds
                 self.scrollbar.setPos(start)
@@ -116,6 +112,13 @@ class SdlOutput(BaseOutput):
                 end = self.endTime
                 start = end - self.displayedSeconds
 
+            (availStart, availEnd) = self.store.getRange()
+            if availStart is None:
+                availStart = nowTime
+            if availEnd is None:
+                availEnd = nowTime
+            posEnd = max(availEnd, end, nowTime)
+            self.scrollbar.setRange(availStart, posEnd)
 
 #             (start, end) = self.store.getRange()
 #             if start is None:

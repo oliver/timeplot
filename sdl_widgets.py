@@ -39,6 +39,8 @@ class SdlHScrollbar:
 
 
     def _getThumb (self):
+        if self.end <= self.start:
+            return (0, self.w)
         pixPerUnit = self.w / (self.end - self.start)
         thumbWidth = self.pwidth * pixPerUnit
         thumbWidth = min(thumbWidth, self.w)
