@@ -47,6 +47,8 @@ class SdlHScrollbar:
         return (thumbX, thumbWidth)
 
     def _calcPos (self, mouseX):
+        if (self.end - self.start) < self.pwidth:
+            return
         newPos = (float(mouseX - self.x) / self.w) * (self.end - self.start)
         newPos += self.start
         newPos = min(newPos, self.end-self.pwidth)
