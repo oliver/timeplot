@@ -72,12 +72,14 @@ class SdlCheckbox:
     def __init__ (self, x, y, text, onChange=None):
         self.x = x
         self.y = y
-        self.text = text
         self.onChange = onChange
 
         self.w = 16
         self.h = 16
         self._checked = False
+
+        font = pygame.font.Font(None, 20)
+        self.textSurface = font.render(text, True, (192,192,192))
 
     def set (self, checked):
         self._checked = checked
@@ -107,10 +109,7 @@ class SdlCheckbox:
         points.append( (self.x, self.y+self.h) )
         pygame.draw.lines(screen, (192,192,192), True, points)
 
-        #font = pygame.font.get_default_font()
-        font = pygame.font.Font(None, 20)
-        surf = font.render(self.text, True, (192,192,192))
-        screen.blit(surf, (self.x+self.w+5, self.y+1))
+        screen.blit(self.textSurface, (self.x+self.w+5, self.y+1))
 
         if self._checked:
             points = []
