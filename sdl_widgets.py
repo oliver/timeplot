@@ -64,11 +64,21 @@ class SdlHScrollbar:
                e.pos[1] >= self.y and e.pos[1] <= self.y+self.h:
                 #print "  event is inside widget %s" % self
 
-                (thumbX, thumbWidth) = self._getThumb()
-                if e.pos[0] >= self.x + thumbX and e.pos[0] <= self.x + thumbX + thumbWidth:
-                    self.dragging = True
-                    self.offsetX = e.pos[0] - (self.x + thumbX)
-                else:
+                if e.button == 1:
+                    (thumbX, thumbWidth) = self._getThumb()
+                    if e.pos[0] < self.x + thumbX:
+                        self.pos -= self.pwidth
+                        if self.onChange:
+                            self.onChange(self)
+                    elif e.pos[0] > self.x + thumbX + thumbWidth:
+                        self.pos += self.pwidth
+                        if self.onChange:
+                            self.onChange(self)
+                    else:
+                        self.dragging = True
+                        self.offsetX = e.pos[0] - (self.x + thumbX)
+                elif e.button == 2:
+                    # middle click goes directly to selected position
                     self._calcPos(e.pos[0])
         elif e.type == pygame.MOUSEBUTTONUP:
             if self.dragging:
