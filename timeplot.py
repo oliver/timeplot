@@ -1,12 +1,14 @@
 #!/usr/bin/python
 
 
+import sys
 import pygame
 import time
 import math
 
 from event import EventMgr
 from sdl_widgets import *
+from csv_reader import *
 from debug import DBG
 
 
@@ -191,6 +193,10 @@ class SourceManager:
         reader.setId(sourceId)
         self.store.onNewSource(sourceId)
 
+    def start (self):
+        for sourceId,reader in self.inputs.items():
+            reader.start()
+
 
 class InputReader:
     def __init__ (self, store):
@@ -199,6 +205,9 @@ class InputReader:
 
     def setId (self, id):
         self.id = id
+
+    def start (self):
+        pass
 
 
 class TestReader (InputReader):
@@ -335,4 +344,9 @@ if __name__ == '__main__':
     reader = CpuLoadReader(store)
     sourceMgr.add(reader)
 
+    for filename in sys.argv[1:]:
+        reader = CsvReader(store, filename)
+        sourceMgr.add(reader)
+
+    sourceMgr.start()
     widget.run()
