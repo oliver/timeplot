@@ -68,7 +68,7 @@ class SdlOutput(BaseOutput):
         width = 500
         height = 400
 
-        self.screen = pygame.display.set_mode( (width, height), 0)
+        self.screen = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         print "starting"
         while True:
@@ -81,6 +81,9 @@ class SdlOutput(BaseOutput):
                 #print event
                 if event.type == pygame.QUIT:
                     return
+                elif event.type == pygame.VIDEORESIZE:
+                    (width, height) = event.size
+                    self.screen = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
                 else:
                     if self.timers.has_key(event.type):
                         cb = self.timers[event.type]
