@@ -39,12 +39,19 @@ class SdlOutput(BaseOutput):
         # TODO: move these into model:
         self.update = True
         self.endTime = time.time()
+        self.displayedSeconds = 10
 
         pygame.init()
 
-        self.cbUpdate = SdlCheckbox(10, 10, "Update", self.onCbUpdateChanged)
+        self.scrollbar = SdlHScrollbar(10, 10, 400, 16, self.displayedSeconds, self.onScrollbarChanged)
+        self.widgets.append(self.scrollbar)
+
+        self.cbUpdate = SdlCheckbox(430, 10, "Update", self.onCbUpdateChanged)
         self.widgets.append(self.cbUpdate)
         self.cbUpdate.set(self.update)
+
+    def onScrollbarChanged (self, widget):
+        self.endTime = self.scrollbar.getPos() + self.displayedSeconds
 
     def onCbUpdateChanged (self, widget):
         self.update = self.cbUpdate.checked()
@@ -89,13 +96,18 @@ class SdlOutput(BaseOutput):
 
             self.screen.fill( (0, 0, 0) )
 
+            (availStart, availEnd) = self.store.getRange()
+            self.scrollbar.setRange(availStart, availEnd)
+
+
             if self.update:
                 nowTime = time.time()
                 end = nowTime
-                start = end - 10
+                start = end - self.displayedSeconds
+                self.scrollbar.setPos(start)
             else:
                 end = self.endTime
-                start = end - 10
+                start = end - self.displayedSeconds
 
 
 #             (start, end) = self.store.getRange()
