@@ -53,6 +53,9 @@ class SdlHScrollbar:
             return
         newPos = (float(mouseX - self.x) / self.w) * (self.end - self.start)
         newPos += self.start
+        self._updatePos(newPos)
+
+    def _updatePos (self, newPos):
         newPos = min(newPos, self.end-self.pwidth)
         newPos = max(newPos, self.start)
         self.pos = newPos
@@ -69,13 +72,9 @@ class SdlHScrollbar:
                 if e.button == 1:
                     (thumbX, thumbWidth) = self._getThumb()
                     if e.pos[0] < self.x + thumbX:
-                        self.pos -= self.pwidth
-                        if self.onChange:
-                            self.onChange(self)
+                        self._updatePos(self.pos - self.pwidth)
                     elif e.pos[0] > self.x + thumbX + thumbWidth:
-                        self.pos += self.pwidth
-                        if self.onChange:
-                            self.onChange(self)
+                        self._updatePos(self.pos + self.pwidth)
                     else:
                         self.dragging = True
                         self.offsetX = e.pos[0] - (self.x + thumbX)
