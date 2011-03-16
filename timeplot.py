@@ -43,7 +43,7 @@ class SdlOutput(BaseOutput):
 
         pygame.init()
 
-        self.scrollbar = SdlHScrollbar(10, 10, 400, 16, self.displayedSeconds, self.onScrollbarChanged)
+        self.scrollbar = SdlHScrollbar(10, 10, 400, 16, self.displayedSeconds, 3, self.onScrollbarChanged)
         self.widgets.append(self.scrollbar)
 
         self.cbUpdate = SdlCheckbox(430, 10, "Update", self.onCbUpdateChanged)

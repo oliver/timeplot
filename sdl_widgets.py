@@ -12,12 +12,13 @@ class SdlWidget:
 
 
 class SdlHScrollbar:
-    def __init__ (self, x, y, w, h, pageWidth, onChange=None):
+    def __init__ (self, x, y, w, h, pageWidth, lineScroll, onChange=None):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
         self.pwidth = pageWidth
+        self.lineScroll = lineScroll
         self.onChange = onChange
 
         self.start = 0
@@ -85,6 +86,12 @@ class SdlHScrollbar:
                 elif e.button == 2:
                     # middle click goes directly to selected position
                     self._calcPos(e.pos[0])
+                elif e.button == 4:
+                    # wheel up
+                    self._updatePos(self.pos - self.lineScroll)
+                elif e.button == 5:
+                    # wheel down
+                    self._updatePos(self.pos + self.lineScroll)
         elif e.type == pygame.MOUSEBUTTONUP:
             if self.dragging:
                 self.dragging = False
