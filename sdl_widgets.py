@@ -81,6 +81,8 @@ class SdlCheckbox:
 
     def set (self, checked):
         self._checked = checked
+        if self.onChange:
+            self.onChange(self)
 
     def checked (self):
         return self._checked

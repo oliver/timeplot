@@ -51,6 +51,7 @@ class SdlOutput(BaseOutput):
         self.cbUpdate.set(self.update)
 
     def onScrollbarChanged (self, widget):
+        self.cbUpdate.set(False)
         self.endTime = self.scrollbar.getPos() + self.displayedSeconds
 
     def onCbUpdateChanged (self, widget):
