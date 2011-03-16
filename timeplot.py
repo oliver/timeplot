@@ -84,6 +84,9 @@ class SdlOutput(BaseOutput):
                 elif event.type == pygame.VIDEORESIZE:
                     (width, height) = event.size
                     self.screen = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return
                 else:
                     if self.timers.has_key(event.type):
                         cb = self.timers[event.type]
