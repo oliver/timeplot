@@ -52,6 +52,7 @@ class SdlHScrollbar:
         newPos = (float(mouseX - self.x) / self.w) * (self.end - self.start)
         newPos += self.start
         newPos = min(newPos, self.end-self.pwidth)
+        newPos = max(newPos, self.start)
         self.pos = newPos
         if self.onChange:
             self.onChange(self)
