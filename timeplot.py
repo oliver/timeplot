@@ -6,6 +6,7 @@ import time
 import math
 
 from event import EventMgr
+from sdl_widgets import *
 from debug import DBG
 
 
@@ -33,9 +34,21 @@ class SdlOutput(BaseOutput):
 
         self.lastId = pygame.USEREVENT
         self.timers = {}
+        self.widgets = []
+
+        # TODO: move these into model:
+        self.update = True
+        self.endTime = time.time()
 
         pygame.init()
 
+        self.cbUpdate = SdlCheckbox(10, 10, "Update", self.onCbUpdateChanged)
+        self.widgets.append(self.cbUpdate)
+        self.cbUpdate.set(self.update)
+
+    def onCbUpdateChanged (self, widget):
+        self.update = self.cbUpdate.checked()
+        self.endTime = time.time()
 
     def startTimer (self, usec, callback):
         newId = self.lastId+1
@@ -71,11 +84,19 @@ class SdlOutput(BaseOutput):
                         #DBG.brk()
                         pass
 
+                for w in self.widgets:
+                    w.handleEvent(event)
+
             self.screen.fill( (0, 0, 0) )
 
-            nowTime = time.time()
-            end = nowTime
-            start = end - 10
+            if self.update:
+                nowTime = time.time()
+                end = nowTime
+                start = end - 10
+            else:
+                end = self.endTime
+                start = end - 10
+
 
 #             (start, end) = self.store.getRange()
 #             if start is None:
@@ -108,6 +129,9 @@ class SdlOutput(BaseOutput):
                 if len(points) > 1:
                     pygame.draw.lines(self.screen, (255,255,255), False, points)
 
+
+            for w in self.widgets:
+                w.draw(self.screen)
 
             #print self.clock.get_fps()
             pygame.display.flip()
