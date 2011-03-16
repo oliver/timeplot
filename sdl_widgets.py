@@ -24,6 +24,9 @@ class SdlHScrollbar:
         self.end = 1
         self.pos = self.start
 
+        self.dragging = False
+        self.offsetX = None
+
     def setRange (self, start, end):
         self.start = start
         self.end = end
@@ -35,6 +38,22 @@ class SdlHScrollbar:
         return self.pos
 
 
+    def _getThumb (self):
+        pixPerUnit = self.w / (self.end - self.start)
+        thumbWidth = self.pwidth * pixPerUnit
+        thumbWidth = min(thumbWidth, self.w)
+        thumbX = (self.pos - self.start) * pixPerUnit
+        thumbX = max(0, thumbX)
+        return (thumbX, thumbWidth)
+
+    def _calcPos (self, mouseX):
+        newPos = (float(mouseX - self.x) / self.w) * (self.end - self.start)
+        newPos += self.start
+        newPos = min(newPos, self.end-self.pwidth)
+        self.pos = newPos
+        if self.onChange:
+            self.onChange(self)
+
     def handleEvent (self, e):
         if e.type == pygame.MOUSEBUTTONDOWN:
             #print "button down at %d/%d" % e.pos
@@ -42,21 +61,24 @@ class SdlHScrollbar:
                e.pos[1] >= self.y and e.pos[1] <= self.y+self.h:
                 #print "  event is inside widget %s" % self
 
-                newPos = (float(e.pos[0] - self.x) / self.w) * (self.end - self.start)
-                newPos += self.start
-                newPos = min(newPos, self.end-self.pwidth)
-                self.pos = newPos
-                if self.onChange:
-                    self.onChange(self)
+                (thumbX, thumbWidth) = self._getThumb()
+                if e.pos[0] >= self.x + thumbX and e.pos[0] <= self.x + thumbX + thumbWidth:
+                    self.dragging = True
+                    self.offsetX = e.pos[0] - (self.x + thumbX)
+                else:
+                    self._calcPos(e.pos[0])
+        elif e.type == pygame.MOUSEBUTTONUP:
+            if self.dragging:
+                self.dragging = False
+        elif e.type == pygame.MOUSEMOTION:
+            if self.dragging:
+                self._calcPos(e.pos[0] - self.offsetX)
+
 
     def draw (self, screen):
         screen.fill( (0, 0, 0), (self.x, self.y, self.w, self.h) )
 
-        pixPerUnit = self.w / (self.end - self.start)
-        thumbWidth = self.pwidth * pixPerUnit
-        thumbWidth = min(thumbWidth, self.w)
-        thumbX = (self.pos - self.start) * pixPerUnit
-        thumbX = max(0, thumbX)
+        (thumbX, thumbWidth) = self._getThumb()
         screen.fill( (128,128,128), (self.x+thumbX, self.y, thumbWidth, self.h) )
 
         points = []
