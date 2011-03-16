@@ -122,12 +122,32 @@ class SdlOutput(BaseOutput):
             allPoints = self.store.get(start, end)
             #print allPoints
 
-            yMin = -3
-            yMax = 100
+            yMin = -10
+            yMax = 110
             yRange = yMax - yMin
 
             factorX = float(width)  / duration
             factorY = float(height) / yRange
+
+
+            # draw grid
+            font = pygame.font.Font(None, 18)
+            for i in range(int(start), int(end)+2):
+                x = (i - start) * factorX
+                pygame.draw.line(self.screen, (64,64,64), (x,0), (x,height))
+
+                if i % 5 == 0:
+                    timeStr = time.strftime("%H:%M:%S", time.localtime(i))
+                    surf = font.render(timeStr, True, (128,128,128))
+                    self.screen.blit(surf, (x-(surf.get_width()/2), height-20))
+
+            for i in xrange(yMin, yMax, 10):
+                y = height - ((i - yMin) * factorY)
+                color = (64,64,64)
+                if i % 100 == 0:
+                    color = (128,128,128)
+                pygame.draw.line(self.screen, color, (0,y), (width,y))
+
 
             for id,l in allPoints.items():
                 #print len(l)
