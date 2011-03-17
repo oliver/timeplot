@@ -310,26 +310,45 @@ class DataStore:
         "returns dict of lists of tuples"
         result = {}
         for id in self.data:
-            l = []
-            preDataAdded = False
-            postDataAdded = False
             sourceData = self.data[id]
-            for i,tup in enumerate(sourceData):
-                t = tup[0]
-                if t >= start and t <= end:
-                    if not(preDataAdded):
-                        preDataAdded = True
-                        if i > 0:
-                            # always add one earlier than requested:
-                            prevTup = sourceData[i-1]
-                            l.append(prevTup)
-                    l.append(tup)
-                elif t > end and not(postDataAdded):
-                    postDataAdded = True
-                    if i < len(sourceData)-1:
-                        # always add one more than requested:
-                        nextTup = sourceData[i+1]
-                        l.append(nextTup)
+            if not(sourceData):
+                result[id] = []
+                continue
+
+            def search (data, time):
+                """
+                Returns a tuple of two indexes; first is the index of the item before the requested time,
+                second is the index of the item after (or exactly at) the requested time.
+                Either value can be None (if there is no such index).
+                """
+                prevIndex = None
+                for i,tup in enumerate(data):
+                    t = tup[0]
+                    if t >= time:
+                        return (prevIndex, i)
+                    prevIndex = i
+                return (prevIndex, None)
+
+            firstIndex = search(sourceData, start)
+            lastIndex = search(sourceData, end)
+
+            i1 = firstIndex[1]
+            if i1 is None:
+                i1 = firstIndex[0]
+            assert(i1 is not None)
+
+            i2 = lastIndex[1]
+            if i2 is None:
+                i2 = lastIndex[0]
+            assert(i2 is not None)
+
+            i1 = max(0, i1-1)
+            i2 = min(len(sourceData), i2+1)
+
+            l = []
+            for i in range(i1, i2):
+                tup = sourceData[i]
+                l.append(tup)
             result[id] = l
         return result
 
