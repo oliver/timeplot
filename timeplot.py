@@ -311,14 +311,22 @@ class DataStore:
         result = {}
         for id in self.data:
             l = []
+            postDataAdded = False
             prevTuple = None
-            for tup in self.data[id]:
+            sourceData = self.data[id]
+            for i,tup in enumerate(sourceData):
                 t = tup[0]
                 if t >= start and t <= end:
                     if not(l) and prevTuple is not None:
                         # always add one earlier than requested:
                         l.append(prevTuple)
                     l.append(tup)
+                elif t > end and not(postDataAdded):
+                    postDataAdded = True
+                    if i < len(sourceData)-1:
+                        # always add one more than requested:
+                        nextTup = sourceData[i+1]
+                        l.append(nextTup)
                 prevTuple = tup
             result[id] = l
         return result
