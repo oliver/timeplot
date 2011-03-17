@@ -21,11 +21,15 @@ class CsvReader (InputReader):
 
         self.readAvailableData()
 
-        EventMgr.startTimer(100*1000, self.readAvailableData)
+        EventMgr.startTimer(100*1000, self.onTimer)
 
-    def readAvailableData (self):
+    def onTimer (self):
         offset = self.fd.tell()
         self.fd.seek(offset)
+        self.readAvailableData()
+        return True
+
+    def readAvailableData (self):
         while True:
             try:
                 r = self.reader.next()
@@ -34,4 +38,3 @@ class CsvReader (InputReader):
             t = float(r[0])
             v = float(r[1])
             self.store.update( (self.id, t, v) )
-        return True
