@@ -163,15 +163,27 @@ class SdlOutput(BaseOutput):
 
             for id,l in allPoints.items():
                 #print len(l)
-                points = []
-                for e in l:
-                    t = e[0]
-                    value = e[1]
-                    x = (t - start) * factorX
-                    y = height - ((value - yMin) * factorY)
-                    points.append( (x,y) )
-                if len(points) > 1:
-                    pygame.draw.lines(self.screen, (255,255,255), False, points)
+                if not(l):
+                    continue
+                if type(l[0][1]) == bool:
+                    # event data
+                    for e in l:
+                        t = e[0]
+                        value = e[1]
+                        if value:
+                            x = (t - start) * factorX
+                            pygame.draw.line(self.screen, (255,255,255), (x,0), (x,height))
+                else:
+                    # value data
+                    points = []
+                    for e in l:
+                        t = e[0]
+                        value = e[1]
+                        x = (t - start) * factorX
+                        y = height - ((value - yMin) * factorY)
+                        points.append( (x,y) )
+                    if len(points) > 1:
+                        pygame.draw.lines(self.screen, (255,255,255), False, points)
 
 
             for w in self.widgets:
@@ -395,6 +407,10 @@ if __name__ == '__main__':
     
     reader = CpuLoadReader(store)
     sourceMgr.add(reader)
+
+    # event data source
+    testReader = TestFuncReader(store, lambda t: int(t) % 2 == 0, 1000*1000)
+    sourceMgr.add(testReader)
 
     for filename in sys.argv[1:]:
         reader = CsvReader(store, filename)
