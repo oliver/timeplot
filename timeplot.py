@@ -6,8 +6,12 @@ import time
 import math
 
 from event import EventMgr
+from base_reader import InputReader
 from sdl_output import SdlOutput
+
+from sys_linux_reader import *
 from csv_reader import *
+
 from debug import DBG
 
 
@@ -25,18 +29,6 @@ class SourceManager:
     def start (self):
         for sourceId,reader in self.inputs.items():
             reader.start()
-
-
-class InputReader:
-    def __init__ (self, store):
-        self.store = store
-        self.id = None
-
-    def setId (self, id):
-        self.id = id
-
-    def start (self):
-        pass
 
 
 class TestReader (InputReader):
@@ -72,44 +64,6 @@ class TestFuncReader (InputReader):
         value = self.func(t)
         self.store.update( (self.id, t, value) )
         return True
-
-
-class CpuLoadReader (InputReader):
-    def __init__ (self, store):
-        InputReader.__init__(self, store)
-        self.lastCpu = None
-        self.lastIdle = None
-
-        EventMgr.startTimer(200*1000, self.onTimer)
-
-    def onTimer (self):
-        t = time.time()
-
-        percent = None
-        fd = open('/proc/stat')
-        for l in fd:
-            l = l.rstrip('\n')
-            (name, value) = l.split(None, 1)
-            if name == 'cpu':
-                values = [int(x) for x in value.split()]
-                (tUser, tNice, tKernel, tIdle) = values[:4]
-                tCpu = tUser + tNice + tKernel
-
-                if self.lastCpu is not None:
-                    dCpu = tCpu - self.lastCpu
-                    dIdle = tIdle - self.lastIdle
-                    if dCpu+dIdle > 0:
-                        percent = (float(dCpu) / (dCpu+dIdle)) * 100.0
-                self.lastCpu = tCpu
-                self.lastIdle = tIdle
-
-                break
-        fd.close()
-
-        if percent is not None:
-            self.store.update( (self.id, t, percent) )
-        return True
-
 
 
 class DataStore:

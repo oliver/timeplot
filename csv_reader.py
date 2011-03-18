@@ -1,7 +1,7 @@
 
 import csv
 
-from timeplot import InputReader
+from base_reader import InputReader
 from event import EventMgr
 
 class CsvReader (InputReader):
