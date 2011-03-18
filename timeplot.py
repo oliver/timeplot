@@ -31,26 +31,6 @@ class SourceManager:
             reader.start()
 
 
-class TestReader (InputReader):
-    def __init__ (self, store):
-        InputReader.__init__(self, store)
-
-        self.i = 0
-        EventMgr.startTimer(100*1000, self.onTimer)
-
-    def onTimer (self):
-        #print "timer"
-        t = time.time()
-        #value = self.i
-        #value = self.i * self.i
-        #value = math.sin(self.i / 2.0) * 10.0
-        value = math.sin(t) * 10.0
-        #value = t - int(t)
-        self.store.update( (self.id, t, value) )
-        self.i += 1
-        return True
-
-
 class TestFuncReader (InputReader):
     def __init__ (self, store, func, interval=100*1000):
         "func gets the current time as parameter and must return a value"
