@@ -2,13 +2,13 @@
 
 
 import sys
-import time
 import math
 
 from event import EventMgr
 from base_reader import InputReader
 from sdl_output import SdlOutput
 
+from test_reader import *
 from sys_linux_reader import *
 from csv_reader import *
 
@@ -29,21 +29,6 @@ class SourceManager:
     def start (self):
         for sourceId,reader in self.inputs.items():
             reader.start()
-
-
-class TestFuncReader (InputReader):
-    def __init__ (self, store, func, interval=100*1000):
-        "func gets the current time as parameter and must return a value"
-        InputReader.__init__(self, store)
-        self.func = func
-
-        EventMgr.startTimer(interval, self.onTimer)
-
-    def onTimer (self):
-        t = time.time()
-        value = self.func(t)
-        self.store.update( (self.id, t, value) )
-        return True
 
 
 class DataStore:
