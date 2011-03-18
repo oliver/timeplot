@@ -321,8 +321,31 @@ class DataStore:
                 second is the index of the item after (or exactly at) the requested time.
                 Either value can be None (if there is no such index).
                 """
+
+                # binary search:
+                lo = 0
+                hi = len(data)
+                while lo < hi:
+                    mid = (lo+hi) // 2
+                    midVal = data[mid]
+                    t = midVal[0]
+                    if t < time:
+                        lo = mid + 1
+                    elif t > time:
+                        hi = mid
+                    else:
+                        # exact match
+                        lo = mid
+                        hi = mid
+                        break
+
+                # target is now somewhere between (inclusive) lo-1 and hi+1:
+                lo = max(0, lo-2)
+                hi = min(len(data), hi+2)
+
                 prevIndex = None
-                for i,tup in enumerate(data):
+                for i in range(lo, hi):
+                    tup = data[i]
                     t = tup[0]
                     if t >= time:
                         return (prevIndex, i)
