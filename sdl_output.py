@@ -16,6 +16,7 @@ class SdlOutput(BaseOutput):
         self.widgets = []
 
         # TODO: move these into model:
+        self.showAll = False
         self.update = True
         self.endTime = time.time()
         self.displayedSeconds = 10
@@ -29,6 +30,10 @@ class SdlOutput(BaseOutput):
         self.widgets.append(self.cbUpdate)
         self.cbUpdate.set(self.update)
 
+        self.cbShowAll = SdlCheckbox(10, 40, "Show All", self.onCbShowAllChanged)
+        self.widgets.append(self.cbShowAll)
+        self.cbShowAll.set(self.showAll)
+
     def onScrollbarChanged (self, widget):
         self.cbUpdate.set(False)
         self.endTime = self.scrollbar.getPos() + self.displayedSeconds
@@ -36,6 +41,9 @@ class SdlOutput(BaseOutput):
     def onCbUpdateChanged (self, widget):
         self.update = self.cbUpdate.checked()
         self.endTime = time.time()
+
+    def onCbShowAllChanged (self, widget):
+        self.showAll = self.cbShowAll.checked()
 
     def startTimer (self, usec, callback):
         newId = self.lastId+1
@@ -83,7 +91,17 @@ class SdlOutput(BaseOutput):
             self.screen.fill( (0, 0, 0) )
 
             nowTime = time.time()
-            if self.update:
+
+            (availStart, availEnd) = self.store.getRange()
+            if availStart is None:
+                availStart = nowTime
+            if availEnd is None:
+                availEnd = nowTime
+
+            if self.showAll:
+                start = availStart
+                end = availEnd
+            elif self.update:
                 end = nowTime
                 start = end - self.displayedSeconds
                 self.scrollbar.setPos(start)
@@ -91,11 +109,6 @@ class SdlOutput(BaseOutput):
                 end = self.endTime
                 start = end - self.displayedSeconds
 
-            (availStart, availEnd) = self.store.getRange()
-            if availStart is None:
-                availStart = nowTime
-            if availEnd is None:
-                availEnd = nowTime
             posEnd = max(availEnd, end, nowTime)
             self.scrollbar.setRange(availStart, posEnd)
 
