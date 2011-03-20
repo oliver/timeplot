@@ -21,6 +21,15 @@ class SdlOutput(BaseOutput):
         self.endTime = time.time()
         self.displayedSeconds = 10
 
+        # create list of possible X grid intervals:
+        self._xIntervals = []
+        for sec in [0.5, 1, 5, 10]:
+            self._xIntervals.append(int(sec))
+            self._xIntervals.append(int(sec*60))
+            self._xIntervals.append(int(sec*60*60))
+        self._xIntervals.remove(0)
+        self._xIntervals.sort()
+
         pygame.init()
 
         self.scrollbar = SdlHScrollbar(10, 10, 400, 16, self.displayedSeconds, 3, self.onScrollbarChanged)
@@ -52,6 +61,17 @@ class SdlOutput(BaseOutput):
         self.timers[newId] = callback
         pygame.time.set_timer(newId, int(usec / 1000.0))
         self.lastId = newId
+
+    def _roundXInterval (self, target):
+        bestInterval = 1
+        bestDiff = None
+        for interval in self._xIntervals:
+            diff = abs(target-interval)
+            if bestDiff is None or diff < bestDiff:
+                bestInterval = interval
+                bestDiff = diff
+        return bestInterval
+
 
     def run (self):
         width = 500
@@ -135,8 +155,16 @@ class SdlOutput(BaseOutput):
 
 
             # draw grid
+
+            # show about 10 marks on X axis:
+            xInterval = int(duration / 10.0) 
+            xInterval = self._roundXInterval(xInterval)
+            # round grid start time to same interval:
+            firstMark = int(start)
+            firstMark = firstMark - (firstMark % xInterval)
+
             font = pygame.font.Font(None, 18)
-            for i in range(int(start), int(end)+2):
+            for i in range(firstMark, int(end)+2, xInterval):
                 x = (i - start) * factorX
                 pygame.draw.line(self.screen, (64,64,64), (x,0), (x,height))
 
