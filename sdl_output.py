@@ -74,8 +74,8 @@ class SdlOutput(BaseOutput):
 
 
     def run (self):
-        width = 500
-        height = 400
+        width = 800
+        height = 600
 
         self.screen = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
