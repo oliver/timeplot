@@ -44,6 +44,8 @@ class SdlOutput(BaseOutput):
 
     def onCbShowAllChanged (self, widget):
         self.showAll = self.cbShowAll.checked()
+        self.scrollbar.setVisibility(not(self.showAll))
+        self.cbUpdate.setVisibility(not(self.showAll))
 
     def startTimer (self, usec, callback):
         newId = self.lastId+1

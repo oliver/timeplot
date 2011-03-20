@@ -3,16 +3,22 @@ import pygame
 
 
 class SdlWidget:
+    def __init__ (self):
+        self.visible = True
+
     def handleEvent (self, event):
         pass
 
     def draw (self, screen):
         pass
 
+    def setVisibility (self, visible):
+        self.visible = visible
 
 
-class SdlHScrollbar:
+class SdlHScrollbar (SdlWidget):
     def __init__ (self, x, y, w, h, pageWidth, lineScroll, onChange=None):
+        SdlWidget.__init__(self)
         self.x = x
         self.y = y
         self.w = w
@@ -68,6 +74,8 @@ class SdlHScrollbar:
             self.onChange(self)
 
     def handleEvent (self, e):
+        if not(self.visible): return
+
         if e.type == pygame.MOUSEBUTTONDOWN:
             #print "button down at %d/%d" % e.pos
             if e.pos[0] >= self.x and e.pos[0] <= self.x+self.w and \
@@ -101,6 +109,8 @@ class SdlHScrollbar:
 
 
     def draw (self, screen):
+        if not(self.visible): return
+
         screen.fill( (0, 0, 0), (self.x, self.y, self.w, self.h) )
 
         (thumbX, thumbWidth) = self._getThumb()
@@ -115,8 +125,9 @@ class SdlHScrollbar:
 
 
 
-class SdlCheckbox:
+class SdlCheckbox (SdlWidget):
     def __init__ (self, x, y, text, onChange=None):
+        SdlWidget.__init__(self)
         self.x = x
         self.y = y
         self.onChange = onChange
@@ -137,6 +148,8 @@ class SdlCheckbox:
         return self._checked
 
     def handleEvent (self, e):
+        if not(self.visible): return
+
         if e.type == pygame.MOUSEBUTTONDOWN:
             #print "button down at %d/%d" % e.pos
             if e.pos[0] >= self.x and e.pos[0] <= self.x+self.w and \
@@ -147,6 +160,8 @@ class SdlCheckbox:
                     self.onChange(self)
 
     def draw (self, screen):
+        if not(self.visible): return
+
         screen.fill( (0, 0, 0), (self.x, self.y, self.w, self.h) )
 
         points = []
