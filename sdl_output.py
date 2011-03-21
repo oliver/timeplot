@@ -20,6 +20,9 @@ class SdlOutput(BaseOutput):
         self.update = True
         self.endTime = time.time()
         self.displayedSeconds = 10
+        
+        self.start = None
+        self.end = None
 
         self.zooming = False
 
@@ -51,15 +54,18 @@ class SdlOutput(BaseOutput):
     def onScrollbarChanged (self, widget):
         self.cbUpdate.set(False)
         self.endTime = self.scrollbar.getPos() + self.displayedSeconds
+        self._setRange()
 
     def onCbUpdateChanged (self, widget):
         self.update = self.cbUpdate.checked()
         self.endTime = time.time()
+        self._setRange()
 
     def onCbShowAllChanged (self, widget):
         self.showAll = self.cbShowAll.checked()
         self.scrollbar.setVisibility(not(self.showAll))
         self.cbUpdate.setVisibility(not(self.showAll))
+        self._setRange()
 
     def startTimer (self, usec, callback):
         newId = self.lastId+1
@@ -76,6 +82,11 @@ class SdlOutput(BaseOutput):
                 bestInterval = interval
                 bestDiff = diff
         return bestInterval
+
+    def _setRange (self):
+        if not(self.showAll) and not(self.update):
+            self.end = self.endTime
+            self.start = self.end - self.displayedSeconds
 
 
     def run (self):
@@ -150,20 +161,19 @@ class SdlOutput(BaseOutput):
                 availEnd = nowTime
 
             if self.showAll:
-                start = availStart
-                end = availEnd
+                self.start = availStart
+                self.end = availEnd
             elif self.update:
-                end = nowTime
-                start = end - self.displayedSeconds
-                self.scrollbar.setPos(start)
+                self.end = nowTime
+                self.start = self.end - self.displayedSeconds
+                self.scrollbar.setPos(self.start)
             else:
-                end = self.endTime
-                start = end - self.displayedSeconds
+                pass
 
-            self.lblDebug.set("%d - %d (%s - %s)" % (start, end,
-                time.strftime("%c", time.localtime(start)), time.strftime("%c", time.localtime(end)) ))
+            self.lblDebug.set("%d - %d (%s - %s)" % (self.start, self.end,
+                time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)) ))
 
-            posEnd = max(availEnd, end, nowTime)
+            posEnd = max(availEnd, self.end, nowTime)
             self.scrollbar.setRange(availStart, posEnd)
 
 #             (start, end) = self.store.getRange()
@@ -172,10 +182,10 @@ class SdlOutput(BaseOutput):
 #                 end = time.time()
 #             if (start - end) < 2.1:
 #                 start = end - 2.1
-            duration = end - start
+            duration = self.end - self.start
             #print start, end
 
-            allPoints = self.store.get(start, end)
+            allPoints = self.store.get(self.start, self.end)
             #print allPoints
 
             yMin = -10
@@ -192,12 +202,12 @@ class SdlOutput(BaseOutput):
             xInterval = int(duration / 10.0) 
             xInterval = self._roundXInterval(xInterval)
             # round grid start time to same interval:
-            firstMark = int(start)
+            firstMark = int(self.start)
             firstMark = firstMark - (firstMark % xInterval)
 
             font = pygame.font.Font(None, 18)
-            for i in range(firstMark, int(end)+2, xInterval):
-                x = (i - start) * factorX
+            for i in range(firstMark, int(self.end)+2, xInterval):
+                x = (i - self.start) * factorX
                 pygame.draw.line(self.screen, (64,64,64), (x,0), (x,height))
 
                 if i % 5 == 0:
@@ -223,7 +233,7 @@ class SdlOutput(BaseOutput):
                         t = e[0]
                         value = e[1]
                         if value:
-                            x = (t - start) * factorX
+                            x = (t - self.start) * factorX
                             pygame.draw.line(self.screen, (255,255,255), (x,0), (x,height))
                 else:
                     # value data
@@ -231,7 +241,7 @@ class SdlOutput(BaseOutput):
                     for e in l:
                         t = e[0]
                         value = e[1]
-                        x = (t - start) * factorX
+                        x = (t - self.start) * factorX
                         y = height - ((value - yMin) * factorY)
                         points.append( (x,y) )
                     if len(points) > 1:
@@ -257,8 +267,12 @@ class SdlOutput(BaseOutput):
                     # calculate time from screen coordinate
                     x1 = (self.zoomStart[0] / factorX) + self.start
                     x2 = (self.zoomEnd[0] / factorX) + self.start
-                    print time.strftime("%c", time.localtime(x1))
-                    print time.strftime("%c", time.localtime(x2))
+                    if x2 < x1:
+                        (x2, x1) = (x1, x2)
+                    self.cbShowAll.set(False)
+                    self.cbUpdate.set(False)
+                    self.start = x1
+                    self.end = x2
 
             #print self.clock.get_fps()
             pygame.display.flip()
