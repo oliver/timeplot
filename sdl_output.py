@@ -26,6 +26,9 @@ class SdlOutput(BaseOutput):
 
         self.zooming = False
 
+        self.width = 800
+        self.height = 600
+
         # create list of possible X grid intervals:
         self._xIntervals = []
         for sec in [0.5, 1, 5, 10]:
@@ -92,10 +95,7 @@ class SdlOutput(BaseOutput):
 
 
     def run (self):
-        width = 800
-        height = 600
-
-        self.screen = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode( (self.width, self.height), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         print "starting"
         while True:
@@ -121,8 +121,8 @@ class SdlOutput(BaseOutput):
                 if event.type == pygame.QUIT:
                     return
                 elif event.type == pygame.VIDEORESIZE:
-                    (width, height) = event.size
-                    self.screen = pygame.display.set_mode( (width, height), pygame.RESIZABLE)
+                    (self.width, self.height) = event.size
+                    self.screen = pygame.display.set_mode( (self.width, self.height), pygame.RESIZABLE)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         return
@@ -194,8 +194,8 @@ class SdlOutput(BaseOutput):
             yMax = 110
             yRange = yMax - yMin
 
-            factorX = float(width)  / duration
-            factorY = float(height) / yRange
+            factorX = float(self.width)  / duration
+            factorY = float(self.height) / yRange
 
 
             # draw grid
@@ -210,19 +210,19 @@ class SdlOutput(BaseOutput):
             font = pygame.font.Font(None, 18)
             for i in range(firstMark, int(self.end)+2, xInterval):
                 x = (i - self.start) * factorX
-                pygame.draw.line(self.screen, (64,64,64), (x,0), (x,height))
+                pygame.draw.line(self.screen, (64,64,64), (x,0), (x,self.height))
 
                 if i % 5 == 0:
                     timeStr = time.strftime("%H:%M:%S", time.localtime(i))
                     surf = font.render(timeStr, True, (128,128,128))
-                    self.screen.blit(surf, (x-(surf.get_width()/2), height-20))
+                    self.screen.blit(surf, (x-(surf.get_width()/2), self.height-20))
 
             for i in xrange(yMin, yMax, 10):
-                y = height - ((i - yMin) * factorY)
+                y = self.height - ((i - yMin) * factorY)
                 color = (64,64,64)
                 if i % 100 == 0:
                     color = (128,128,128)
-                pygame.draw.line(self.screen, color, (0,y), (width,y))
+                pygame.draw.line(self.screen, color, (0,y), (self.width,y))
 
 
             for id,l in allPoints.items():
@@ -236,7 +236,7 @@ class SdlOutput(BaseOutput):
                         value = e[1]
                         if value:
                             x = (t - self.start) * factorX
-                            pygame.draw.line(self.screen, (255,255,255), (x,0), (x,height))
+                            pygame.draw.line(self.screen, (255,255,255), (x,0), (x,self.height))
                 else:
                     # value data
                     points = []
@@ -244,7 +244,7 @@ class SdlOutput(BaseOutput):
                         t = e[0]
                         value = e[1]
                         x = (t - self.start) * factorX
-                        y = height - ((value - yMin) * factorY)
+                        y = self.height - ((value - yMin) * factorY)
                         points.append( (x,y) )
                     if len(points) > 1:
                         pygame.draw.lines(self.screen, (255,255,255), False, points)
@@ -258,7 +258,7 @@ class SdlOutput(BaseOutput):
                 rect = (self.zoomStart[0],
                         0,
                         self.zoomEnd[0] - self.zoomStart[0],
-                        height
+                        self.height
                         )
                 pygame.draw.rect(self.screen, (255,255,128), rect, 1)
 
