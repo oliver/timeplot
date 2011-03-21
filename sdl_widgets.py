@@ -180,3 +180,22 @@ class SdlCheckbox (SdlWidget):
             points.append( (self.x+self.w, self.y) )
             points.append( (self.x, self.y+self.h) )
             pygame.draw.lines(screen, (192,192,192), False, points)
+
+
+
+class SdlLabel (SdlWidget):
+    def __init__ (self, x, y):
+        SdlWidget.__init__(self)
+        self.x = x
+        self.y = y
+
+        self.font = pygame.font.Font(None, 20)
+        self.textSurface = self.font.render("", True, (192,192,192))
+
+    def set (self, text):
+        self.textSurface = self.font.render(text, True, (192,192,192))
+
+    def draw (self, screen):
+        if not(self.visible): return
+
+        screen.blit(self.textSurface, (self.x, self.y))

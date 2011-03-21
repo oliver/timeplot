@@ -42,6 +42,9 @@ class SdlOutput(BaseOutput):
         self.cbShowAll = SdlCheckbox(10, 40, "Show All", self.onCbShowAllChanged)
         self.widgets.append(self.cbShowAll)
         self.cbShowAll.set(self.showAll)
+        
+        self.lblDebug = SdlLabel(10, 70)
+        self.widgets.append(self.lblDebug)
 
     def onScrollbarChanged (self, widget):
         self.cbUpdate.set(False)
@@ -130,6 +133,9 @@ class SdlOutput(BaseOutput):
             else:
                 end = self.endTime
                 start = end - self.displayedSeconds
+
+            self.lblDebug.set("%d - %d (%s - %s)" % (start, end,
+                time.strftime("%c", time.localtime(start)), time.strftime("%c", time.localtime(end)) ))
 
             posEnd = max(availEnd, end, nowTime)
             self.scrollbar.setRange(availStart, posEnd)
