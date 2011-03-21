@@ -21,6 +21,8 @@ class SdlOutput(BaseOutput):
         self.endTime = time.time()
         self.displayedSeconds = 10
 
+        self.zooming = False
+
         # create list of possible X grid intervals:
         self._xIntervals = []
         for sec in [0.5, 1, 5, 10]:
@@ -88,7 +90,9 @@ class SdlOutput(BaseOutput):
             # TODO: timer resolution is now tied to the Hz value here;
             # it might be better if timers and fd watchers are independent of any static update rate.
             timePassed = self.clock.tick(30)
-            
+
+            doZoom = False
+
             for event in pygame.event.get():
                 #print event
                 if event.type == pygame.QUIT:
@@ -99,6 +103,21 @@ class SdlOutput(BaseOutput):
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         return
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # start zoom
+                    if event.button == 1:
+                        self.zooming = True
+                        self.zoomStart = event.pos
+                        self.zoomEnd = event.pos
+                        pygame.mouse.set_cursor(*pygame.cursors.diamond)
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if self.zooming:
+                        self.zooming = False
+                        pygame.mouse.set_cursor(*pygame.cursors.arrow)
+                        doZoom = True
+                elif event.type == pygame.MOUSEMOTION:
+                    if self.zooming:
+                        self.zoomEnd = event.pos
                 else:
                     if self.timers.has_key(event.type):
                         cb = self.timers[event.type]
@@ -214,6 +233,25 @@ class SdlOutput(BaseOutput):
 
             for w in self.widgets:
                 w.draw(self.screen)
+
+            # draw zoom rectangle over everything else
+            if self.zooming:
+                rect = (self.zoomStart[0],
+                        0,
+                        self.zoomEnd[0] - self.zoomStart[0],
+                        height
+                        )
+                pygame.draw.rect(self.screen, (255,255,128), rect, 1)
+
+            # hack...
+            if doZoom:
+                doZoom = False
+                if self.zoomStart[0] != self.zoomEnd[0]:
+                    # calculate time from screen coordinate
+                    x1 = (self.zoomStart[0] / factorX) + self.start
+                    x2 = (self.zoomEnd[0] / factorX) + self.start
+                    print time.strftime("%c", time.localtime(x1))
+                    print time.strftime("%c", time.localtime(x2))
 
             #print self.clock.get_fps()
             pygame.display.flip()
