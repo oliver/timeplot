@@ -58,6 +58,8 @@ class SdlOutput(BaseOutput):
 
     def onCbUpdateChanged (self, widget):
         self.update = self.cbUpdate.checked()
+        if self.update:
+            self.displayedSeconds = 10
         self.endTime = time.time()
         self._setRange()
 
@@ -273,6 +275,9 @@ class SdlOutput(BaseOutput):
                     self.cbUpdate.set(False)
                     self.start = x1
                     self.end = x2
+                    self.displayedSeconds = self.end - self.start
+                    self.scrollbar.setPageWidth( self.displayedSeconds )
+                    self.scrollbar.setPos(self.start)
 
             #print self.clock.get_fps()
             pygame.display.flip()

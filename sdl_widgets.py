@@ -38,6 +38,9 @@ class SdlHScrollbar (SdlWidget):
         self.start = start
         self.end = end
 
+    def setPageWidth (self, pageWidth):
+        self.pwidth = pageWidth
+
     def setPos (self, pos):
         self.pos = pos
 
