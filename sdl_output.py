@@ -94,6 +94,16 @@ class SdlOutput(BaseOutput):
             doZoom = False
 
             for event in pygame.event.get():
+                handled = False
+                for w in reversed(self.widgets):
+                    if w.handleEvent(event):
+                        # event was handled by this widget
+                        handled = True
+                        break
+
+                if handled:
+                    continue
+
                 #print event
                 if event.type == pygame.QUIT:
                     return
@@ -128,9 +138,6 @@ class SdlOutput(BaseOutput):
                     else:
                         #DBG.brk()
                         pass
-
-                for w in self.widgets:
-                    w.handleEvent(event)
 
             self.screen.fill( (0, 0, 0) )
 

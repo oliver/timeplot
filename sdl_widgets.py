@@ -100,12 +100,15 @@ class SdlHScrollbar (SdlWidget):
                 elif e.button == 5:
                     # wheel down
                     self._updatePos(self.pos + self.lineScroll)
+                return True
         elif e.type == pygame.MOUSEBUTTONUP:
             if self.dragging:
                 self.dragging = False
+                return True
         elif e.type == pygame.MOUSEMOTION:
             if self.dragging:
                 self._calcPos(e.pos[0] - self.offsetX)
+                return True
 
 
     def draw (self, screen):
@@ -158,6 +161,7 @@ class SdlCheckbox (SdlWidget):
                 self._checked = not(self._checked)
                 if self.onChange:
                     self.onChange(self)
+                return True
 
     def draw (self, screen):
         if not(self.visible): return
