@@ -145,6 +145,40 @@ class SdlOutput(BaseOutput):
                         self.zoomStart = event.pos
                         self.zoomEnd = event.pos
                         pygame.mouse.set_cursor(*pygame.cursors.diamond)
+                    elif event.button == 4 and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                        # zoom in
+                        oldDuration = self.end - self.start
+                        newDuration = oldDuration / 2.0
+                        diff = oldDuration - newDuration
+                        if diff > 0.1: # show at least 100 ms
+                            halfDiff = diff / 2.0
+                            newStart = self.start + halfDiff
+                            newEnd = self.end - halfDiff
+                            self.cbShowAll.set(False)
+                            self.cbUpdate.set(False)
+                            self.start = newStart
+                            self.end = newEnd
+                            assert(self.end >= self.start)
+                            self.displayedSeconds = self.end - self.start
+                            self.scrollbar.setPageWidth(self.displayedSeconds)
+                            self.scrollbar.setPos(self.start)
+                    elif event.button == 5 and pygame.key.get_mods() & pygame.KMOD_CTRL:
+                        # zoom out
+                        oldDuration = self.end - self.start
+                        newDuration = oldDuration * 2.0
+                        diff = newDuration - oldDuration
+                        if diff < 60*60*24*365: # show at most one year
+                            halfDiff = diff / 2.0
+                            newStart = self.start - halfDiff
+                            newEnd = self.end + halfDiff
+                            self.cbShowAll.set(False)
+                            self.cbUpdate.set(False)
+                            self.start = newStart
+                            self.end = newEnd
+                            assert(self.end >= self.start)
+                            self.displayedSeconds = newDuration
+                            self.scrollbar.setPageWidth(self.displayedSeconds)
+                            self.scrollbar.setPos(self.start)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if self.zooming:
                         self.zooming = False
