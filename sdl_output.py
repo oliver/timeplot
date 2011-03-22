@@ -184,8 +184,9 @@ class SdlOutput(BaseOutput):
             else:
                 pass
 
-            self.lblDebug.set("%d - %d (%s - %s)" % (self.start, self.end,
-                time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)) ))
+            self.lblDebug.set("%d - %d (%s - %s) (%.3f)" % (self.start, self.end,
+                time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)),
+                self.end-self.start ))
 
             posEnd = max(availEnd, self.end, nowTime)
             self.scrollbar.setRange(availStart, posEnd)
