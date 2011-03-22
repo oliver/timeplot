@@ -63,6 +63,9 @@ class DataStore:
                 result[id] = []
                 continue
 
+            if sourceData[0][0] > end or sourceData[-1][0] < start:
+                continue
+
             def search (data, time):
                 """
                 Returns a tuple of two indexes; first is the index of the item before the requested time,
