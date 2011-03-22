@@ -280,7 +280,7 @@ class SdlOutput(BaseOutput):
                     for e in l:
                         t = e[0]
                         value = e[1]
-                        if value:
+                        if value and t >= self.start and t <= self.end:
                             x = self._xToScreen(t)
                             pygame.draw.line(self.screen, (255,255,255), (x,0), (x,self.height))
                 else:
