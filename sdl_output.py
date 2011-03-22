@@ -93,6 +93,18 @@ class SdlOutput(BaseOutput):
             self.end = self.endTime
             self.start = self.end - self.displayedSeconds
 
+    def _xToPos (self, sx):
+        duration = self.end - self.start
+        factorX = float(self.width) / duration
+        px = (sx / factorX) + self.start
+        return px
+
+    def _xToScreen (self, px):
+        duration = self.end - self.start
+        factorX = float(self.width) / duration
+        sx = (px - self.start) * factorX
+        return sx
+
 
     def run (self):
         self.screen = pygame.display.set_mode( (self.width, self.height), pygame.RESIZABLE)
@@ -194,7 +206,6 @@ class SdlOutput(BaseOutput):
             yMax = 110
             yRange = yMax - yMin
 
-            factorX = float(self.width)  / duration
             factorY = float(self.height) / yRange
 
 
@@ -209,7 +220,7 @@ class SdlOutput(BaseOutput):
 
             font = pygame.font.Font(None, 18)
             for i in range(firstMark, int(self.end)+2, xInterval):
-                x = (i - self.start) * factorX
+                x = self._xToScreen(i)
                 pygame.draw.line(self.screen, (64,64,64), (x,0), (x,self.height))
 
                 if i % 5 == 0:
@@ -235,7 +246,7 @@ class SdlOutput(BaseOutput):
                         t = e[0]
                         value = e[1]
                         if value:
-                            x = (t - self.start) * factorX
+                            x = self._xToScreen(t)
                             pygame.draw.line(self.screen, (255,255,255), (x,0), (x,self.height))
                 else:
                     # value data
@@ -243,7 +254,7 @@ class SdlOutput(BaseOutput):
                     for e in l:
                         t = e[0]
                         value = e[1]
-                        x = (t - self.start) * factorX
+                        x = self._xToScreen(t)
                         y = self.height - ((value - yMin) * factorY)
                         points.append( (x,y) )
                     if len(points) > 1:
@@ -267,8 +278,8 @@ class SdlOutput(BaseOutput):
                 doZoom = False
                 if self.zoomStart[0] != self.zoomEnd[0]:
                     # calculate time from screen coordinate
-                    x1 = (self.zoomStart[0] / factorX) + self.start
-                    x2 = (self.zoomEnd[0] / factorX) + self.start
+                    x1 = self._xToPos(self.zoomStart[0])
+                    x2 = self._xToPos(self.zoomEnd[0])
                     if x2 < x1:
                         (x2, x1) = (x1, x2)
                     self.cbShowAll.set(False)
