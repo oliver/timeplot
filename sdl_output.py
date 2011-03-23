@@ -30,12 +30,17 @@ class SdlOutput(BaseOutput):
         self.height = 600
 
         # create list of possible X grid intervals:
+        self.floatFactorLength = 3
+        self.floatFactor = 10 ** self.floatFactorLength
+
         self._xIntervals = []
         for sec in [0.25, 0.5, 1, 5, 10]:
+            sec *= self.floatFactor
             self._xIntervals.append(sec)
             self._xIntervals.append(int(sec*60))
             self._xIntervals.append(int(sec*60*60))
-        self._xIntervals += [0.01, 0.05, 0.1, 0.2]
+        for sec in [0.01, 0.05, 0.1, 0.2]:
+            self._xIntervals.append(sec * self.floatFactor)
         self._xIntervals.sort()
 
         pygame.init()
@@ -247,34 +252,36 @@ class SdlOutput(BaseOutput):
             # draw grid
 
             # show about 10 marks on X axis:
-            xInterval = duration / 10.0
+            xInterval = (duration * self.floatFactor) / 10.0
             xInterval = self._roundXInterval(xInterval)
+            assert(float(xInterval).is_integer())
+            xInterval = int(xInterval)
             # round grid start time to same interval:
-            firstMark = int(self.start)
+            firstMark = int(self.start * self.floatFactor)
             firstMark = firstMark - (firstMark % xInterval)
+            lastMark = int((self.end+2) * self.floatFactor)
 
             # show about 2-3 time labels on X axis:
-            xTextInterval = duration / 2.5
+            xTextInterval = (duration * self.floatFactor) / 2.5
             xTextInterval = self._roundXInterval(xTextInterval)
+            assert(float(xTextInterval).is_integer())
+            xTextInterval = int(xTextInterval)
 
             font = pygame.font.Font(None, 18)
-            i = 0
-            while True:
-                t = firstMark + (i*xInterval)
-                i+=1
-                if t >= int(self.end)+2:
-                    break
-
+            for tScaled in range(firstMark, lastMark, xInterval):
+                t = float(tScaled) / self.floatFactor
                 x = self._xToScreen(t)
 
                 pygame.draw.line(self.screen, (64,64,64), (x,0), (x,self.height))
 
-                if t % (xTextInterval) == 0:
+                if tScaled % (xTextInterval) == 0:
                     timeStr = time.strftime("%H:%M:%S", time.localtime(t))
-                    if not(float(t).is_integer()):
-                        fract = t - int(t)
-                        fractStr = str(fract)[1:].rstrip('0')
-                        timeStr += fractStr
+                    if tScaled % self.floatFactor != 0:
+                        fract = int(tScaled % self.floatFactor)
+                        formatString = "%0" + str(self.floatFactorLength) + "d"
+                        fractStr = formatString % fract
+                        fractStr = fractStr.rstrip('0')
+                        timeStr += "." + fractStr
                     surf = font.render(timeStr, True, (128,128,128))
                     self.screen.blit(surf, (x-(surf.get_width()/2), self.height-20))
 
