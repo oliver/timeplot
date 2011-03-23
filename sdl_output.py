@@ -271,6 +271,8 @@ class SdlOutput(BaseOutput):
             for tScaled in range(firstMark, lastMark, xInterval):
                 t = float(tScaled) / self.floatFactor
                 x = self._xToScreen(t)
+                if x < -100 or x > self.width+100:
+                    continue
 
                 pygame.draw.line(self.screen, (64,64,64), (x,0), (x,self.height))
 
