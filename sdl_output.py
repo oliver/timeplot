@@ -55,8 +55,11 @@ class SdlOutput(BaseOutput):
         self.cbShowAll = SdlCheckbox(10, 40, "Show All", self.onCbShowAllChanged)
         self.widgets.append(self.cbShowAll)
         self.cbShowAll.set(self.showAll)
+
+        self.lblCurrent = SdlLabel(10, 70)
+        self.widgets.append(self.lblCurrent)
         
-        self.lblDebug = SdlLabel(10, 70)
+        self.lblDebug = SdlLabel(10, 100)
         self.widgets.append(self.lblDebug)
 
     def onScrollbarChanged (self, widget):
@@ -202,6 +205,18 @@ class SdlOutput(BaseOutput):
                     else:
                         #DBG.brk()
                         pass
+
+            if pygame.mouse.get_focused() and self.start is not None:
+                pos = pygame.mouse.get_pos()
+                t = self._xToPos(pos[0])
+                timeStr = time.strftime("%H:%M:%S", time.localtime(t))
+                fract = t - int(t)
+                fractStr = "%f" % fract
+                fractStr = fractStr[1:5]
+                currentPos = "%s%s" % (timeStr, fractStr)
+                self.lblCurrent.set(currentPos)
+            else:
+                self.lblCurrent.set("")
 
             self.screen.fill( (0, 0, 0) )
 
