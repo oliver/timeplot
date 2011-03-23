@@ -25,6 +25,7 @@ class SdlOutput(BaseOutput):
         self.end = None
 
         self.zooming = False
+        self.panning = False
 
         self.width = 800
         self.height = 600
@@ -150,9 +151,16 @@ class SdlOutput(BaseOutput):
                     # start zoom
                     if event.button == 1:
                         self.zooming = True
+                        self.panning = False
                         self.zoomStart = event.pos
                         self.zoomEnd = event.pos
                         pygame.mouse.set_cursor(*pygame.cursors.diamond)
+                    if event.button == 2:
+                        self.panning = True
+                        self.zooming = False
+                        pygame.mouse.set_cursor(*pygame.cursors.broken_x)
+                        self.panStartX = event.pos[0]
+                        self.panStartTime = self.start
                     elif event.button == 4 and pygame.key.get_mods() & pygame.KMOD_CTRL:
                         # zoom in
                         oldDuration = self.end - self.start
@@ -192,9 +200,16 @@ class SdlOutput(BaseOutput):
                         self.zooming = False
                         pygame.mouse.set_cursor(*pygame.cursors.arrow)
                         doZoom = True
+                    if self.panning:
+                        self.panning = False
+                        pygame.mouse.set_cursor(*pygame.cursors.arrow)
                 elif event.type == pygame.MOUSEMOTION:
                     if self.zooming:
                         self.zoomEnd = event.pos
+                    if self.panning:
+                        diff = self._xToPos(self.panStartX) - self._xToPos(event.pos[0])
+                        self.start = self.panStartTime + diff
+                        self.end = self.start + self.displayedSeconds
                 else:
                     if self.timers.has_key(event.type):
                         cb = self.timers[event.type]
