@@ -31,11 +31,11 @@ class SdlOutput(BaseOutput):
 
         # create list of possible X grid intervals:
         self._xIntervals = []
-        for sec in [0.5, 1, 5, 10]:
-            self._xIntervals.append(int(sec))
+        for sec in [0.25, 0.5, 1, 5, 10]:
+            self._xIntervals.append(sec)
             self._xIntervals.append(int(sec*60))
             self._xIntervals.append(int(sec*60*60))
-        self._xIntervals.remove(0)
+        self._xIntervals += [0.01, 0.05, 0.1, 0.2]
         self._xIntervals.sort()
 
         pygame.init()
@@ -79,7 +79,7 @@ class SdlOutput(BaseOutput):
         self.lastId = newId
 
     def _roundXInterval (self, target):
-        bestInterval = 1
+        bestInterval = self._xIntervals[0]
         bestDiff = None
         for interval in self._xIntervals:
             diff = abs(target-interval)
@@ -247,19 +247,34 @@ class SdlOutput(BaseOutput):
             # draw grid
 
             # show about 10 marks on X axis:
-            xInterval = int(duration / 10.0) 
+            xInterval = duration / 10.0
             xInterval = self._roundXInterval(xInterval)
             # round grid start time to same interval:
             firstMark = int(self.start)
             firstMark = firstMark - (firstMark % xInterval)
 
+            # show about 2-3 time labels on X axis:
+            xTextInterval = duration / 2.5
+            xTextInterval = self._roundXInterval(xTextInterval)
+
             font = pygame.font.Font(None, 18)
-            for i in range(firstMark, int(self.end)+2, xInterval):
-                x = self._xToScreen(i)
+            i = 0
+            while True:
+                t = firstMark + (i*xInterval)
+                i+=1
+                if t >= int(self.end)+2:
+                    break
+
+                x = self._xToScreen(t)
+
                 pygame.draw.line(self.screen, (64,64,64), (x,0), (x,self.height))
 
-                if i % 5 == 0:
-                    timeStr = time.strftime("%H:%M:%S", time.localtime(i))
+                if t % (xTextInterval) == 0:
+                    timeStr = time.strftime("%H:%M:%S", time.localtime(t))
+                    if not(float(t).is_integer()):
+                        fract = t - int(t)
+                        fractStr = str(fract)[1:].rstrip('0')
+                        timeStr += fractStr
                     surf = font.render(timeStr, True, (128,128,128))
                     self.screen.blit(surf, (x-(surf.get_width()/2), self.height-20))
 
