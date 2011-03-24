@@ -169,6 +169,7 @@ class SdlOutput(BaseOutput):
                         self.start = savedStart
                         self.end = savedEnd
                         self.displayedSeconds = self.end - self.start
+                        self.scrollbar.setPageWidth(self.displayedSeconds)
                     elif event.button == 4 and pygame.key.get_mods() & pygame.KMOD_CTRL:
                         # zoom in
                         oldDuration = self.end - self.start
@@ -218,6 +219,7 @@ class SdlOutput(BaseOutput):
                         diff = self._xToPos(self.panStartX) - self._xToPos(event.pos[0])
                         self.start = self.panStartTime + diff
                         self.end = self.start + self.displayedSeconds
+                        self.scrollbar.setPos(self.start)
                 else:
                     if self.timers.has_key(event.type):
                         cb = self.timers[event.type]
