@@ -43,6 +43,8 @@ class SdlOutput(BaseOutput):
             self._xIntervals.append(int(sec*60*60))
         for sec in [0.01, 0.05, 0.1, 0.2]:
             self._xIntervals.append(sec * self.floatFactor)
+        for hour in [1, 3, 6, 12, 24, 24*2, 24*7, 24*30, 24*30*2, 24*30*6, 24*365]:
+            self._xIntervals.append(hour * 60*60 * self.floatFactor)
         self._xIntervals.sort()
 
         pygame.init()
