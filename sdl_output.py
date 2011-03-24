@@ -1,6 +1,7 @@
 
 import pygame
 import time
+import datetime
 
 from base_output import *
 from sdl_widgets import *
@@ -304,6 +305,12 @@ class SdlOutput(BaseOutput):
             assert(float(xTextInterval).is_integer())
             xTextInterval = int(xTextInterval)
 
+            showDate = False
+            startDate = datetime.datetime.fromtimestamp(self.start)
+            endDate = datetime.datetime.fromtimestamp(self.end)
+            if startDate.date() != endDate.date():
+                showDate = True
+
             font = pygame.font.Font(None, 18)
             for tScaled in range(firstMark, lastMark, xInterval):
                 t = float(tScaled) / self.floatFactor
@@ -314,6 +321,11 @@ class SdlOutput(BaseOutput):
                 pygame.draw.line(self.screen, (64,64,64), (x,0), (x,self.height))
 
                 if tScaled % (xTextInterval) == 0:
+                    if showDate:
+                        dateStr = time.strftime("%a, %Y-%m-%d", time.localtime(t))
+                        surf = font.render(dateStr, True, (128,128,128))
+                        self.screen.blit(surf, (x-(surf.get_width()/2), self.height-40))
+
                     timeStr = time.strftime("%H:%M:%S", time.localtime(t))
                     if tScaled % self.floatFactor != 0:
                         fract = int(tScaled % self.floatFactor)
