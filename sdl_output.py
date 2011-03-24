@@ -126,8 +126,6 @@ class SdlOutput(BaseOutput):
             # it might be better if timers and fd watchers are independent of any static update rate.
             timePassed = self.clock.tick(30)
 
-            doZoom = False
-
             for event in pygame.event.get():
                 handled = False
                 for w in reversed(self.widgets):
@@ -208,7 +206,20 @@ class SdlOutput(BaseOutput):
                     if self.zooming:
                         self.zooming = False
                         pygame.mouse.set_cursor(*pygame.cursors.arrow)
-                        doZoom = True
+                        if self.zoomStart[0] != self.zoomEnd[0]:
+                            # calculate time from screen coordinate
+                            x1 = self._xToPos(self.zoomStart[0])
+                            x2 = self._xToPos(self.zoomEnd[0])
+                            if x2 < x1:
+                                (x2, x1) = (x1, x2)
+                            self.cbShowAll.set(False)
+                            self.cbUpdate.set(False)
+                            self.start = x1
+                            self.end = x2
+                            self.displayedSeconds = self.end - self.start
+                            self.scrollbar.setPageWidth( self.displayedSeconds )
+                            self.scrollbar.setPos(self.start)
+
                     if self.panning:
                         self.panning = False
                         pygame.mouse.set_cursor(*pygame.cursors.arrow)
@@ -382,23 +393,6 @@ class SdlOutput(BaseOutput):
                         self.height
                         )
                 pygame.draw.rect(self.screen, (255,255,128), rect, 1)
-
-            # hack...
-            if doZoom:
-                doZoom = False
-                if self.zoomStart[0] != self.zoomEnd[0]:
-                    # calculate time from screen coordinate
-                    x1 = self._xToPos(self.zoomStart[0])
-                    x2 = self._xToPos(self.zoomEnd[0])
-                    if x2 < x1:
-                        (x2, x1) = (x1, x2)
-                    self.cbShowAll.set(False)
-                    self.cbUpdate.set(False)
-                    self.start = x1
-                    self.end = x2
-                    self.displayedSeconds = self.end - self.start
-                    self.scrollbar.setPageWidth( self.displayedSeconds )
-                    self.scrollbar.setPos(self.start)
 
             #print self.clock.get_fps()
             pygame.display.flip()
