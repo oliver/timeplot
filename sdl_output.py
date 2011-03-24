@@ -161,6 +161,13 @@ class SdlOutput(BaseOutput):
                         pygame.mouse.set_cursor(*pygame.cursors.broken_x)
                         self.panStartX = event.pos[0]
                         self.panStartTime = self.start
+                        savedStart = self.start
+                        savedEnd = self.end
+                        self.cbUpdate.set(False)
+                        self.cbShowAll.set(False)
+                        self.start = savedStart
+                        self.end = savedEnd
+                        self.displayedSeconds = self.end - self.start
                     elif event.button == 4 and pygame.key.get_mods() & pygame.KMOD_CTRL:
                         # zoom in
                         oldDuration = self.end - self.start
