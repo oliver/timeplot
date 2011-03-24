@@ -274,10 +274,6 @@ class SdlOutput(BaseOutput):
             else:
                 pass
 
-            self.lblDebug.set("%d - %d (%s - %s) (%.3f)" % (self.start, self.end,
-                time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)),
-                self.end-self.start ))
-
             posEnd = max(availEnd, self.end, nowTime)
             self.scrollbar.setRange(availStart, posEnd)
 
@@ -381,6 +377,10 @@ class SdlOutput(BaseOutput):
                     if len(points) > 1:
                         pygame.draw.lines(self.screen, (255,255,255), False, points)
 
+            self.lblDebug.set("%s - %s (%.3f) (%fs; %fs)" % (
+                time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)),
+                self.end-self.start,
+                float(xInterval)/self.floatFactor, float(xTextInterval)/self.floatFactor))
 
             for w in self.widgets:
                 w.draw(self.screen)
