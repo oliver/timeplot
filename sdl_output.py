@@ -231,7 +231,7 @@ class SdlOutput(BaseOutput):
             if pygame.mouse.get_focused() and self.start is not None:
                 pos = pygame.mouse.get_pos()
                 t = self._xToPos(pos[0])
-                timeStr = time.strftime("%H:%M:%S", time.localtime(t))
+                timeStr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
                 fract = t - int(t)
                 fractStr = "%f" % fract
                 fractStr = fractStr[1:5]
