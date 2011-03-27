@@ -146,6 +146,9 @@ if __name__ == '__main__':
     except:
         pass
 
+    reader = NetIfReader(store, 'eth0')
+    sourceMgr.add(reader)
+
     # event data source
     testReader = TestFuncReader(store, lambda t: int(t) % 2 == 0, 1000*1000)
     sourceMgr.add(testReader)

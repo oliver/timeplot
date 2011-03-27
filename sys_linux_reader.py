@@ -44,3 +44,49 @@ class CpuLoadReader (InputReader):
             self.store.update( (self.id, t, percent) )
         return True
 
+class NetIfReader (InputReader):
+    def __init__ (self, store, ifName):
+        InputReader.__init__(self, store)
+        self.targetIf = ifName
+
+        self.lastData = {}
+
+        EventMgr.startTimer(100*1000, self.onTimer)
+
+    def onTimer (self):
+        t = time.time()
+        allDiffs = {}
+
+        fd = open('/proc/net/dev')
+        fd.readline() # first two lines contain headers
+        fd.readline()
+
+        for l in fd:
+            l = l.rstrip('\n')
+            l = l.lstrip(' ')
+            (ifName, data) = l.split(':', 1)
+
+            intData = []
+            for s in data.split():
+                intData.append(int(s))
+
+#            (rBytes, rPackets, rErrors, rDrop, rFifo, rFrame, rComp, rMcast,
+#             tBytes, tPackets, tErrors, tDrop, tFifo, tColls, tCarrier, tComp) = intData
+#            print rBytes, tBytes
+            
+            if self.lastData.has_key(ifName):
+                diff = []
+                for i,v in enumerate(self.lastData[ifName]):
+                    diff.append(intData[i] - v)
+                    assert(diff[i] >= 0) # TODO: handle overflow
+                allDiffs[ifName] = diff
+
+            self.lastData[ifName] = intData
+        fd.close()
+
+        #print allDiffs
+
+        if allDiffs.has_key(self.targetIf):
+            self.store.update( (self.id, t, allDiffs[self.targetIf][1]) )
+        return True
+
