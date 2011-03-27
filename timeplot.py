@@ -119,11 +119,7 @@ class DataStore:
             i1 = max(0, i1-1)
             i2 = min(len(sourceData), i2+1)
 
-            l = []
-            for i in range(i1, i2):
-                tup = sourceData[i]
-                l.append(tup)
-            result[id] = l
+            result[id] = sourceData[i1:i2]
         return result
 
 
