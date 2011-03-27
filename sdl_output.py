@@ -379,10 +379,11 @@ class SdlOutput(BaseOutput):
                     if len(points) > 1:
                         pygame.draw.lines(self.screen, (255,255,255), False, points)
 
-            self.lblDebug.set("%s - %s (%.3f) (%fs; %fs)" % (
+            self.lblDebug.set("%s - %s (%.3f) (%fs; %fs) (%.2f)" % (
                 time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)),
                 self.end-self.start,
-                float(xInterval)/self.floatFactor, float(xTextInterval)/self.floatFactor))
+                float(xInterval)/self.floatFactor, float(xTextInterval)/self.floatFactor,
+                self.clock.get_fps()))
 
             for w in self.widgets:
                 w.draw(self.screen)
