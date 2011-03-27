@@ -1,4 +1,5 @@
 
+import os
 import time
 
 from base_reader import InputReader
@@ -9,6 +10,9 @@ class CpuLoadReader (InputReader):
         InputReader.__init__(self, store)
         self.lastCpu = None
         self.lastIdle = None
+
+        if not(os.path.isdir('/proc')):
+            raise Exception("/proc directory not found")
 
         EventMgr.startTimer(200*1000, self.onTimer)
 

@@ -139,9 +139,12 @@ if __name__ == '__main__':
     sourceMgr.add(testReader)
     testReader = TestFuncReader(store, lambda t: t - int(t), 50*1000)
     sourceMgr.add(testReader)
-    
-    reader = CpuLoadReader(store)
-    sourceMgr.add(reader)
+
+    try:
+        reader = CpuLoadReader(store)
+        sourceMgr.add(reader)
+    except:
+        pass
 
     # event data source
     testReader = TestFuncReader(store, lambda t: int(t) % 2 == 0, 1000*1000)
