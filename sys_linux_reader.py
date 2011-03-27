@@ -51,6 +51,9 @@ class NetIfReader (InputReader):
 
         self.lastData = {}
 
+        if not(os.path.isfile('/proc/net/dev')):
+            raise Exception("/proc/net/dev file not found")
+
         EventMgr.startTimer(100*1000, self.onTimer)
 
     def onTimer (self):
