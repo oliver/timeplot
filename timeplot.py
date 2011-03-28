@@ -31,6 +31,12 @@ class SourceManager:
             if reader:
                 reader.start()
 
+    def sources (self):
+        l = []
+        for id in self.inputs:
+            l.append( (id, "source #%d" % id) )
+        return l
+
     def register (self, name, unit=None):
         sourceId = len(self.inputs)
         self.inputs[sourceId] = None # TODO
@@ -139,7 +145,7 @@ if __name__ == '__main__':
     sourceMgr = SourceManager(store)
 
     # start GUI
-    widget = SdlOutput(None, store)
+    widget = SdlOutput(None, store, sourceMgr)
     EventMgr.setImpl(widget)
 
     # add data sources

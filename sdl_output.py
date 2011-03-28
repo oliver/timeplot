@@ -8,9 +8,10 @@ from sdl_widgets import *
 
 
 class SdlOutput(BaseOutput):
-    def __init__ (self, model, store):
+    def __init__ (self, model, store, sourceMgr):
         BaseOutput.__init__(self, model)
         self.store = store
+        self.sourceMgr = sourceMgr
 
         self.lastId = pygame.USEREVENT
         self.timers = {}
@@ -84,6 +85,13 @@ class SdlOutput(BaseOutput):
         self.cbUpdate.setVisibility(not(self.showAll))
         self._setRange()
 
+    def onCbSourceToggled (self, widget):
+        # TODO: the callback should also provide user-defined parameters
+        for id,m in self.sourceLabels.items():
+            if m['widget'] == widget:
+                m['visible'] = widget.checked()
+                break
+
     def startTimer (self, usec, callback):
         newId = self.lastId+1
         self.timers[newId] = callback
@@ -121,6 +129,18 @@ class SdlOutput(BaseOutput):
     def run (self):
         self.screen = pygame.display.set_mode( (self.width, self.height), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
+
+        # TODO: react to sources added at runtime
+        self.sourceLabels = {}
+        x = self.width - 200
+        y = 10
+        for (id, sourceName) in self.sourceMgr.sources():
+            label = SdlCheckbox(x, y, sourceName, self.onCbSourceToggled)
+            label.set(True)
+            self.sourceLabels[id] = {'widget': label, 'visible': True}
+            self.widgets.append(label)
+            y += 30
+
         print "starting"
         while True:
 
@@ -358,6 +378,8 @@ class SdlOutput(BaseOutput):
             for id,l in allPoints.items():
                 #print len(l)
                 if not(l):
+                    continue
+                if not(self.sourceLabels[id]['visible']):
                     continue
                 if type(l[0][1]) == bool:
                     # event data
