@@ -45,7 +45,7 @@ class CpuLoadReader (InputReader):
         return True
 
 class NetIfReader (InputReader):
-    def __init__ (self, store, ifName):
+    def __init__ (self, sourceMgr, store, ifName):
         InputReader.__init__(self, store)
         self.targetIf = ifName
 
@@ -53,6 +53,12 @@ class NetIfReader (InputReader):
 
         if not(os.path.isfile('/proc/net/dev')):
             raise Exception("/proc/net/dev file not found")
+
+        self.ids = {}
+        self.ids['rBytes'] = sourceMgr.register(ifName + ' bytes received', unit='bytes')
+        self.ids['rPackets'] = sourceMgr.register(ifName + ' packets received', unit='packets')
+        self.ids['tBytes'] = sourceMgr.register(ifName + ' bytes transmitted', unit='bytes')
+        self.ids['tPackets'] = sourceMgr.register(ifName + ' packets transmitted', unit='packets')
 
         EventMgr.startTimer(100*1000, self.onTimer)
 
@@ -76,7 +82,7 @@ class NetIfReader (InputReader):
 #            (rBytes, rPackets, rErrors, rDrop, rFifo, rFrame, rComp, rMcast,
 #             tBytes, tPackets, tErrors, tDrop, tFifo, tColls, tCarrier, tComp) = intData
 #            print rBytes, tBytes
-            
+
             if self.lastData.has_key(ifName):
                 diff = []
                 for i,v in enumerate(self.lastData[ifName]):
@@ -90,6 +96,7 @@ class NetIfReader (InputReader):
         #print allDiffs
 
         if allDiffs.has_key(self.targetIf):
-            self.store.update( (self.id, t, allDiffs[self.targetIf][1]) )
+            self.store.update( (self.ids['rPackets'], t, allDiffs[self.targetIf][1]) )
+            self.store.update( (self.ids['tPackets'], t, allDiffs[self.targetIf][9]) )
         return True
 

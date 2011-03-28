@@ -28,7 +28,17 @@ class SourceManager:
 
     def start (self):
         for sourceId,reader in self.inputs.items():
-            reader.start()
+            if reader:
+                reader.start()
+
+    def register (self, name, unit=None):
+        sourceId = len(self.inputs)
+        self.inputs[sourceId] = None # TODO
+        self.store.onNewSource(sourceId)
+        return sourceId
+
+    def unregister (self, id):
+        raise Exception("not yet implemented")
 
 
 class DataStore:
@@ -147,8 +157,7 @@ if __name__ == '__main__':
         pass
 
     try:
-        reader = NetIfReader(store, 'eth0')
-        sourceMgr.add(reader)
+        reader = NetIfReader(sourceMgr, store, 'eth0')
     except:
         pass
 
