@@ -22,19 +22,19 @@ class SourceManager:
 
     def add (self, reader):
         sourceId = len(self.inputs)
-        self.inputs[sourceId] = reader
+        self.inputs[sourceId] = {'name': "source #%d" % sourceId}
         reader.setId(sourceId)
         self.store.onNewSource(sourceId)
 
     def sources (self):
         l = []
         for id in self.inputs:
-            l.append( (id, "source #%d" % id) )
+            l.append( (id, self.inputs[id]['name']) )
         return l
 
     def register (self, name, unit=None):
         sourceId = len(self.inputs)
-        self.inputs[sourceId] = None # TODO
+        self.inputs[sourceId] = {'name': name}
         self.store.onNewSource(sourceId)
         return sourceId
 
