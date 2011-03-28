@@ -7,6 +7,3 @@ class InputReader:
     def setId (self, id):
         self.id = id
 
-    def start (self):
-        pass
-

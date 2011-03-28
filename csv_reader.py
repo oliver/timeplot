@@ -5,11 +5,12 @@ from base_reader import InputReader
 from event import EventMgr
 
 class CsvReader (InputReader):
-    def __init__ (self, store, filename):
+    def __init__ (self, sourceMgr, store, filename):
         InputReader.__init__(self, store)
         self.filename = filename
 
-    def start (self):
+        self.id = sourceMgr.register('CSV (%s)' % self.filename)
+
         self.fd = open(self.filename, 'rb')
         sampleText = self.fd.read(1024)
         dialect = csv.Sniffer().sniff(sampleText)

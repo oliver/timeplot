@@ -26,11 +26,6 @@ class SourceManager:
         reader.setId(sourceId)
         self.store.onNewSource(sourceId)
 
-    def start (self):
-        for sourceId,reader in self.inputs.items():
-            if reader:
-                reader.start()
-
     def sources (self):
         l = []
         for id in self.inputs:
@@ -172,8 +167,6 @@ if __name__ == '__main__':
     sourceMgr.add(testReader)
 
     for filename in sys.argv[1:]:
-        reader = CsvReader(store, filename)
-        sourceMgr.add(reader)
+        reader = CsvReader(sourceMgr, store, filename)
 
-    sourceMgr.start()
     widget.run()
