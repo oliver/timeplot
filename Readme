@@ -1,0 +1,19 @@
+Time Plotter
+============
+A GUI tool for displaying and analyzing time-based data.
+
+[no warranty; still in alpha stage; don't expect it to work]
+
+
+Usage
+-----
+Pass name(s) of CSV file(s) as command line parameters.
+CSV files must have UNIX time (seconds since 1970) as first column, and values as second column.
+
+
+Interaction
+-----------
+left click: open zoom rectangle
+middle click + drag: panning
+ctrl + mouse wheel: zoom in/out
+
