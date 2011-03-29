@@ -152,8 +152,7 @@ if __name__ == '__main__':
     sourceMgr.add(testReader)
 
     try:
-        reader = CpuLoadReader(store)
-        sourceMgr.add(reader)
+        reader = CpuLoadReader(sourceMgr, store)
     except:
         pass
 

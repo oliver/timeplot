@@ -6,42 +6,45 @@ from base_reader import InputReader
 from event import EventMgr
 
 class CpuLoadReader (InputReader):
-    def __init__ (self, store):
+    def __init__ (self, sourceMgr, store):
         InputReader.__init__(self, store)
-        self.lastCpu = None
-        self.lastIdle = None
+        self.lastValues = None
 
         if not(os.path.isdir('/proc')):
             raise Exception("/proc directory not found")
+
+        # order must match CPU field order in /proc/stat:
+        self.ids = []
+        self.ids.append( sourceMgr.register('CPU user') )
+        self.ids.append( sourceMgr.register('CPU nice') )
+        self.ids.append( sourceMgr.register('CPU system') )
+        self.ids.append( sourceMgr.register('CPU idle') )
 
         EventMgr.startTimer(200*1000, self.onTimer)
 
     def onTimer (self):
         t = time.time()
 
-        percent = None
         fd = open('/proc/stat')
         for l in fd:
             l = l.rstrip('\n')
             (name, value) = l.split(None, 1)
             if name == 'cpu':
                 values = [int(x) for x in value.split()]
-                (tUser, tNice, tKernel, tIdle) = values[:4]
-                tCpu = tUser + tNice + tKernel
+                values = values[:4]
 
-                if self.lastCpu is not None:
-                    dCpu = tCpu - self.lastCpu
-                    dIdle = tIdle - self.lastIdle
-                    if dCpu+dIdle > 0:
-                        percent = (float(dCpu) / (dCpu+dIdle)) * 100.0
-                self.lastCpu = tCpu
-                self.lastIdle = tIdle
-
+                if self.lastValues is not None:
+                    diffs = []
+                    for i,v in enumerate(values):
+                        diffs.append(v - self.lastValues[i])
+                    fullTime = sum(diffs)
+                    if fullTime > 0:
+                        for i,d in enumerate(diffs):
+                            percent = (float(d) / fullTime) * 100
+                            self.store.update( (self.ids[i], t, percent) )
+                self.lastValues = values
                 break
         fd.close()
-
-        if percent is not None:
-            self.store.update( (self.id, t, percent) )
         return True
 
 class NetIfReader (InputReader):
