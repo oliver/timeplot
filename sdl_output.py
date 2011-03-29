@@ -392,7 +392,7 @@ class SdlOutput(BaseOutput):
                         value = e[1]
                         if value and t >= self.start and t <= self.end:
                             x = self._xToScreen(t)
-                            pygame.draw.line(self.screen, SdlStyle.graphColor, (x,0), (x,self.height))
+                            pygame.draw.line(self.screen, SdlStyle.graphColor(id), (x,0), (x,self.height))
                 else:
                     # value data
                     points = []
@@ -403,7 +403,7 @@ class SdlOutput(BaseOutput):
                         y = self.height - ((value - yMin) * factorY)
                         points.append( (x,y) )
                     if len(points) > 1:
-                        pygame.draw.lines(self.screen, SdlStyle.graphColor, False, points)
+                        pygame.draw.lines(self.screen, SdlStyle.graphColor(id), False, points)
 
             self.lblDebug.set("%s - %s (%.3f) (%fs; %fs) (%.2f)" % (
                 time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)),
