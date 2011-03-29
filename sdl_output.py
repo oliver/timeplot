@@ -4,6 +4,7 @@ import time
 import datetime
 
 from base_output import *
+from sdl_common import *
 from sdl_widgets import *
 
 
@@ -276,7 +277,7 @@ class SdlOutput(BaseOutput):
             else:
                 self.lblCurrent.set("")
 
-            self.screen.fill( (0, 0, 0) )
+            self.screen.fill(SdlStyle.bgColor)
 
             nowTime = time.time()
 
@@ -352,12 +353,12 @@ class SdlOutput(BaseOutput):
                 if x < -100 or x > self.width+100:
                     continue
 
-                pygame.draw.line(self.screen, (64,64,64), (x,0), (x,self.height))
+                pygame.draw.line(self.screen, SdlStyle.axisColors[1], (x,0), (x,self.height))
 
                 if tScaled % (xTextInterval) == 0:
                     if showDate:
                         dateStr = time.strftime("%a, %Y-%m-%d", time.localtime(t))
-                        surf = font.render(dateStr, True, (128,128,128))
+                        surf = font.render(dateStr, True, SdlStyle.axisColors[0])
                         self.screen.blit(surf, (x-(surf.get_width()/2), self.height-40))
 
                     timeStr = time.strftime("%H:%M:%S", time.localtime(t))
@@ -367,14 +368,14 @@ class SdlOutput(BaseOutput):
                         fractStr = formatString % fract
                         fractStr = fractStr.rstrip('0')
                         timeStr += "." + fractStr
-                    surf = font.render(timeStr, True, (128,128,128))
+                    surf = font.render(timeStr, True, SdlStyle.axisColors[0])
                     self.screen.blit(surf, (x-(surf.get_width()/2), self.height-20))
 
             for i in xrange(yMin, yMax, 10):
                 y = self.height - ((i - yMin) * factorY)
-                color = (64,64,64)
+                color = SdlStyle.axisColors[1]
                 if i % 100 == 0:
-                    color = (128,128,128)
+                    color = SdlStyle.axisColors[0]
                 pygame.draw.line(self.screen, color, (0,y), (self.width,y))
 
 
@@ -391,7 +392,7 @@ class SdlOutput(BaseOutput):
                         value = e[1]
                         if value and t >= self.start and t <= self.end:
                             x = self._xToScreen(t)
-                            pygame.draw.line(self.screen, (255,255,255), (x,0), (x,self.height))
+                            pygame.draw.line(self.screen, SdlStyle.graphColor, (x,0), (x,self.height))
                 else:
                     # value data
                     points = []
@@ -402,7 +403,7 @@ class SdlOutput(BaseOutput):
                         y = self.height - ((value - yMin) * factorY)
                         points.append( (x,y) )
                     if len(points) > 1:
-                        pygame.draw.lines(self.screen, (255,255,255), False, points)
+                        pygame.draw.lines(self.screen, SdlStyle.graphColor, False, points)
 
             self.lblDebug.set("%s - %s (%.3f) (%fs; %fs) (%.2f)" % (
                 time.strftime("%c", time.localtime(self.start)), time.strftime("%c", time.localtime(self.end)),
@@ -420,7 +421,7 @@ class SdlOutput(BaseOutput):
                         self.zoomEnd[0] - self.zoomStart[0],
                         self.height
                         )
-                pygame.draw.rect(self.screen, (255,255,128), rect, 1)
+                pygame.draw.rect(self.screen, SdlStyle.interactColor, rect, 1)
 
             #print self.clock.get_fps()
             pygame.display.flip()

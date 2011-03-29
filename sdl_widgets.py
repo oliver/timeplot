@@ -1,5 +1,6 @@
 
 import pygame
+from sdl_common import *
 
 
 class SdlWidget:
@@ -117,17 +118,17 @@ class SdlHScrollbar (SdlWidget):
     def draw (self, screen):
         if not(self.visible): return
 
-        screen.fill( (0, 0, 0), (self.x, self.y, self.w, self.h) )
+        screen.fill( SdlStyle.bgColor, (self.x, self.y, self.w, self.h) )
 
         (thumbX, thumbWidth) = self._getThumb()
-        screen.fill( (128,128,128), (self.x+thumbX, self.y, thumbWidth, self.h) )
+        screen.fill( SdlStyle.fillColor, (self.x+thumbX, self.y, thumbWidth, self.h) )
 
         points = []
         points.append( (self.x, self.y) )
         points.append( (self.x+self.w, self.y) )
         points.append( (self.x+self.w, self.y+self.h) )
         points.append( (self.x, self.y+self.h) )
-        pygame.draw.lines(screen, (192,192,192), True, points)
+        pygame.draw.lines(screen, SdlStyle.fgColor, True, points)
 
 
 
@@ -143,7 +144,7 @@ class SdlCheckbox (SdlWidget):
         self._checked = False
 
         font = pygame.font.Font(None, 20)
-        self.textSurface = font.render(text, True, (192,192,192))
+        self.textSurface = font.render(text, True, SdlStyle.fgColor)
 
     def set (self, checked):
         self._checked = checked
@@ -169,14 +170,14 @@ class SdlCheckbox (SdlWidget):
     def draw (self, screen):
         if not(self.visible): return
 
-        screen.fill( (0, 0, 0), (self.x, self.y, self.w, self.h) )
+        screen.fill( SdlStyle.bgColor, (self.x, self.y, self.w, self.h) )
 
         points = []
         points.append( (self.x, self.y) )
         points.append( (self.x+self.w, self.y) )
         points.append( (self.x+self.w, self.y+self.h) )
         points.append( (self.x, self.y+self.h) )
-        pygame.draw.lines(screen, (192,192,192), True, points)
+        pygame.draw.lines(screen, SdlStyle.fgColor, True, points)
 
         screen.blit(self.textSurface, (self.x+self.w+5, self.y+1))
 
@@ -186,7 +187,7 @@ class SdlCheckbox (SdlWidget):
             points.append( (self.x+self.w, self.y+self.h) )
             points.append( (self.x+self.w, self.y) )
             points.append( (self.x, self.y+self.h) )
-            pygame.draw.lines(screen, (192,192,192), False, points)
+            pygame.draw.lines(screen, SdlStyle.fgColor, False, points)
 
 
 
@@ -197,10 +198,10 @@ class SdlLabel (SdlWidget):
         self.y = y
 
         self.font = pygame.font.Font(None, 20)
-        self.textSurface = self.font.render("", True, (192,192,192))
+        self.textSurface = self.font.render("", True, SdlStyle.fgColor)
 
     def set (self, text):
-        self.textSurface = self.font.render(text, True, (192,192,192))
+        self.textSurface = self.font.render(text, True, SdlStyle.fgColor)
 
     def draw (self, screen):
         if not(self.visible): return
