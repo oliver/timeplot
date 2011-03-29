@@ -323,7 +323,7 @@ class SdlOutput(BaseOutput):
             # show about 10 marks on X axis:
             xInterval = (duration * self.floatFactor) / 10.0
             xInterval = self._roundXInterval(xInterval)
-            assert(float(xInterval).is_integer())
+            assert(int(xInterval) == xInterval)
             xInterval = int(xInterval)
             # round grid start time to same interval:
             firstMark = int(self.start * self.floatFactor)
@@ -333,7 +333,7 @@ class SdlOutput(BaseOutput):
             # show about 2-3 time labels on X axis:
             xTextInterval = (duration * self.floatFactor) / 2.5
             xTextInterval = self._roundXInterval(xTextInterval)
-            assert(float(xTextInterval).is_integer())
+            assert(int(xTextInterval) == xTextInterval)
             xTextInterval = int(xTextInterval)
 
             showDate = False
