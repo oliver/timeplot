@@ -324,6 +324,7 @@ class SdlOutput(BaseOutput):
             xInterval = (duration * self.floatFactor) / 10.0
             xInterval = self._roundXInterval(xInterval)
             assert(int(xInterval) == xInterval)
+            assert(xInterval > 0)
             xInterval = int(xInterval)
             # round grid start time to same interval:
             firstMark = int(self.start * self.floatFactor)
@@ -334,6 +335,7 @@ class SdlOutput(BaseOutput):
             xTextInterval = (duration * self.floatFactor) / 2.5
             xTextInterval = self._roundXInterval(xTextInterval)
             assert(int(xTextInterval) == xTextInterval)
+            assert(xTextInterval > 0)
             xTextInterval = int(xTextInterval)
 
             showDate = False
