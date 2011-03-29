@@ -9,8 +9,6 @@ class CsvReader (InputReader):
         InputReader.__init__(self, store)
         self.filename = filename
 
-        self.id = sourceMgr.register('CSV (%s)' % self.filename)
-
         self.fd = open(self.filename, 'rb')
         sampleText = self.fd.read(1024)
         dialect = csv.Sniffer().sniff(sampleText)
@@ -19,6 +17,14 @@ class CsvReader (InputReader):
         self.reader = csv.reader(self.fd, dialect)
         if csv.Sniffer().has_header(sampleText):
             self.reader.next()
+
+            # read header fields
+            lines = sampleText.splitlines()[:2]
+            dictReader = csv.DictReader(lines, dialect=dialect)
+            self.id = sourceMgr.register('%s (%s)' % (dictReader.fieldnames[1], self.filename))
+            del dictReader
+        else:
+            self.id = sourceMgr.register(self.filename)
 
         self.readAvailableData()
 
