@@ -329,6 +329,7 @@ class SdlOutput(BaseOutput):
             # round grid start time to same interval:
             firstMark = int(self.start * self.floatFactor)
             firstMark = firstMark - (firstMark % xInterval)
+            # TODO: the +2 offset is too little when zoomed out
             lastMark = int((self.end+2) * self.floatFactor)
 
             # show about 2-3 time labels on X axis:
