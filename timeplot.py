@@ -144,12 +144,9 @@ if __name__ == '__main__':
     EventMgr.setImpl(widget)
 
     # add data sources
-    testReader = TestFuncReader(store, lambda t: math.sin(t) )
-    sourceMgr.add(testReader)
-    testReader = TestFuncReader(store, lambda t: math.sin(t) * 2.0 )
-    sourceMgr.add(testReader)
-    testReader = TestFuncReader(store, lambda t: t - int(t), 50*1000)
-    sourceMgr.add(testReader)
+    testReader = TestFuncReader(sourceMgr, store, lambda t: math.sin(t), name="test: sin")
+    testReader = TestFuncReader(sourceMgr, store, lambda t: math.sin(t) * 2.0, name="test: 2x sin")
+    testReader = TestFuncReader(sourceMgr, store, lambda t: t - int(t), 50*1000, name="test: second fract.")
 
     try:
         reader = CpuLoadReader(sourceMgr, store)
@@ -162,8 +159,7 @@ if __name__ == '__main__':
         pass
 
     # event data source
-    testReader = TestFuncReader(store, lambda t: int(t) % 2 == 0, 1000*1000)
-    sourceMgr.add(testReader)
+    testReader = TestFuncReader(sourceMgr, store, lambda t: int(t) % 2 == 0, 1000*1000, "test: events")
 
     for filename in sys.argv[1:]:
         reader = CsvReader(sourceMgr, store, filename)
