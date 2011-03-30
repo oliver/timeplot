@@ -145,6 +145,7 @@ class SdlCheckbox (SdlWidget):
 
         font = pygame.font.Font(None, 20)
         self.textSurface = font.render(text, True, SdlStyle.fgColor)
+        self.fullW = self.w + self.textSurface.get_width() + 5 + 5
 
     def set (self, checked):
         self._checked = checked
@@ -159,7 +160,7 @@ class SdlCheckbox (SdlWidget):
 
         if e.type == pygame.MOUSEBUTTONDOWN:
             #print "button down at %d/%d" % e.pos
-            if e.pos[0] >= self.x and e.pos[0] <= self.x+self.w and \
+            if e.pos[0] >= self.x and e.pos[0] <= self.x+self.fullW and \
                e.pos[1] >= self.y and e.pos[1] <= self.y+self.h:
                 #print "  event is inside widget %s" % self
                 self._checked = not(self._checked)
