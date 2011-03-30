@@ -136,6 +136,10 @@ class SdlOutput(BaseOutput):
         x = self.width - 200
         y = 10
         for (id, sourceName) in self.sourceMgr.sources():
+            color = SdlStyle.graphColor(id)
+            colorLabel = SdlLabel(x - 20, y, color=color)
+            colorLabel.set(u"\u2014")
+            self.widgets.append(colorLabel)
             label = SdlCheckbox(x, y, sourceName, self.onCbSourceToggled)
             label.set(True)
             self.sourceLabels[id] = {'widget': label, 'visible': True}

@@ -193,16 +193,17 @@ class SdlCheckbox (SdlWidget):
 
 
 class SdlLabel (SdlWidget):
-    def __init__ (self, x, y):
+    def __init__ (self, x, y, color=SdlStyle.fgColor):
         SdlWidget.__init__(self)
         self.x = x
         self.y = y
+        self.color = color
 
         self.font = pygame.font.Font(None, 20)
-        self.textSurface = self.font.render("", True, SdlStyle.fgColor)
+        self.textSurface = self.font.render("", True, self.color)
 
     def set (self, text):
-        self.textSurface = self.font.render(text, True, SdlStyle.fgColor)
+        self.textSurface = self.font.render(text, True, self.color)
 
     def draw (self, screen):
         if not(self.visible): return
