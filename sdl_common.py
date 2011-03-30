@@ -12,6 +12,18 @@ class SdlStyle:
     ]
 
 
+#    # light style:
+#    bgColor = (255, 255, 255)
+#    fgColor = (0, 0, 0)
+#    fillColor = (128, 128, 128)
+#    interactColor = (255, 0, 0)
+
+#    axisColors = [
+#        (64, 64, 64),
+#        (128, 128, 128),
+#    ]
+
+
     def graphColor (id):
         import hashlib
         h = hashlib.md5(str(id))
