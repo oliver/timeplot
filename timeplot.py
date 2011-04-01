@@ -130,6 +130,12 @@ class DataStore:
 
 
 if __name__ == '__main__':
+    args = sys.argv
+    args.pop(0)
+    if len(args) >= 2 and args[0] == '-c':
+        Cfg.loadFile(args[1])
+        args.pop(0); args.pop(0)
+
     # set up basic objects
     store = DataStore()
     sourceMgr = SourceManager(store)
@@ -155,12 +161,6 @@ if __name__ == '__main__':
 
     # event data source
     testReader = TestFuncReader(sourceMgr, store, lambda t: int(t) % 2 == 0, 1000*1000, "test: events")
-
-    args = sys.argv
-    args.pop(0)
-    if len(args) >= 2 and args[0] == '-c':
-        Cfg.loadFile(args[1])
-        args.pop(0); args.pop(0)
 
     for filename in args:
         reader = CsvReader(sourceMgr, store, filename)
