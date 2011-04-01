@@ -3,6 +3,7 @@ import pygame
 import time
 import datetime
 
+from config import Cfg
 from base_output import *
 from sdl_common import *
 from sdl_widgets import *
@@ -19,8 +20,8 @@ class SdlOutput(BaseOutput):
         self.widgets = []
 
         # TODO: move these into model:
-        self.showAll = False
-        self.update = True
+        self.showAll = Cfg.ui_settings.show_all
+        self.update = Cfg.ui_settings.update
         self.endTime = time.time()
         self.displayedSeconds = 10
         
@@ -75,6 +76,7 @@ class SdlOutput(BaseOutput):
 
     def onCbUpdateChanged (self, widget):
         self.update = self.cbUpdate.checked()
+        Cfg.ui_settings.update = self.update
         if self.update:
             self.displayedSeconds = 10
         self.endTime = time.time()
@@ -82,6 +84,7 @@ class SdlOutput(BaseOutput):
 
     def onCbShowAllChanged (self, widget):
         self.showAll = self.cbShowAll.checked()
+        Cfg.ui_settings.show_all = self.showAll
         self.scrollbar.setVisibility(not(self.showAll))
         self.cbUpdate.setVisibility(not(self.showAll))
         self._setRange()
