@@ -109,8 +109,9 @@ class CfgProxyDict:
         if name.startswith("_"):
             self.__dict__[name] = value
         else:
-            self._cfg[name] = value
-            self._parent.notifyChange()
+            if self._cfg[name] != value:
+                self._cfg[name] = value
+                self._parent.notifyChange()
 
     def notifyChange (self):
         self._parent.notifyChange()
