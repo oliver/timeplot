@@ -10,6 +10,8 @@ class TestFuncReader (InputReader):
         InputReader.__init__(self, store)
 
         self.codeObj = compile(function, '<string>', 'eval')
+        eval(self.codeObj, None, {'t':0}) # check if supplied code is basically ok
+
         self.id = sourceMgr.register(name)
 
         EventMgr.startTimer(interval, self.onTimer)
