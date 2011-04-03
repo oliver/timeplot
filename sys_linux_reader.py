@@ -6,7 +6,7 @@ from base_reader import InputReader
 from event import EventMgr
 
 class CpuLoadReader (InputReader):
-    def __init__ (self, sourceMgr, store):
+    def __init__ (self, sourceMgr, store, interval=200*1000):
         InputReader.__init__(self, store)
         self.lastValues = None
 
@@ -20,7 +20,7 @@ class CpuLoadReader (InputReader):
         self.ids.append( sourceMgr.register('CPU system') )
         self.ids.append( sourceMgr.register('CPU idle') )
 
-        EventMgr.startTimer(200*1000, self.onTimer)
+        EventMgr.startTimer(interval, self.onTimer)
 
     def onTimer (self):
         t = time.time()
@@ -48,7 +48,7 @@ class CpuLoadReader (InputReader):
         return True
 
 class NetIfReader (InputReader):
-    def __init__ (self, sourceMgr, store, if_name):
+    def __init__ (self, sourceMgr, store, if_name, interval=200*1000):
         InputReader.__init__(self, store)
         self.targetIf = if_name
 
@@ -63,7 +63,7 @@ class NetIfReader (InputReader):
         self.ids['tBytes'] = sourceMgr.register(self.targetIf + ' bytes transmitted', unit='bytes')
         self.ids['tPackets'] = sourceMgr.register(self.targetIf + ' packets transmitted', unit='packets')
 
-        EventMgr.startTimer(100*1000, self.onTimer)
+        EventMgr.startTimer(interval, self.onTimer)
 
     def onTimer (self):
         t = time.time()
