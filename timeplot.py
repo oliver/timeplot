@@ -145,24 +145,6 @@ if __name__ == '__main__':
     widget = SdlOutput(None, store, sourceMgr)
     EventMgr.setImpl(widget)
 
-    # add data sources
-    testReader = TestFuncReader(sourceMgr, store, lambda t: math.sin(t), name="test: sin")
-    testReader = TestFuncReader(sourceMgr, store, lambda t: math.sin(t) * 2.0, name="test: 2x sin")
-    testReader = TestFuncReader(sourceMgr, store, lambda t: t - int(t), 50*1000, name="test: second fract.")
-
-    try:
-        reader = CpuLoadReader(sourceMgr, store)
-    except:
-        pass
-
-    try:
-        reader = NetIfReader(sourceMgr, store, 'eth0')
-    except:
-        pass
-
-    # event data source
-    testReader = TestFuncReader(sourceMgr, store, lambda t: int(t) % 2 == 0, 1000*1000, "test: events")
-
     for filename in args:
         reader = CsvReader(sourceMgr, store, filename)
 
