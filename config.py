@@ -80,6 +80,9 @@ class CfgProxyList:
     def notifyChange (self):
         self._parent.notifyChange()
 
+    def copy (self):
+        return self._cfg[:]
+
 
 class CfgProxyDict:
     def __init__ (self, cfg, parent):
@@ -111,6 +114,9 @@ class CfgProxyDict:
 
     def notifyChange (self):
         self._parent.notifyChange()
+
+    def copy (self):
+        return self._cfg.copy()
 
 
 class Config:

@@ -174,7 +174,11 @@ if __name__ == '__main__':
             print "unknown reader type '%s'" % r.type
         else:
             try:
-                reader = classObj(sourceMgr, store)
+                funcArgs = {}
+                for k,v in r.copy().items():
+                    funcArgs[str(k)] = v
+                del funcArgs['type']
+                reader = classObj(sourceMgr, store, **funcArgs)
             except Exception, e:
                 print "could not load reader '%s' (%s)" % (r.type, e)
 

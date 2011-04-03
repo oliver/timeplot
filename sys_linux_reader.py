@@ -48,9 +48,9 @@ class CpuLoadReader (InputReader):
         return True
 
 class NetIfReader (InputReader):
-    def __init__ (self, sourceMgr, store, ifName):
+    def __init__ (self, sourceMgr, store, if_name):
         InputReader.__init__(self, store)
-        self.targetIf = ifName
+        self.targetIf = if_name
 
         self.lastData = {}
 
@@ -58,10 +58,10 @@ class NetIfReader (InputReader):
             raise Exception("/proc/net/dev file not found")
 
         self.ids = {}
-        self.ids['rBytes'] = sourceMgr.register(ifName + ' bytes received', unit='bytes')
-        self.ids['rPackets'] = sourceMgr.register(ifName + ' packets received', unit='packets')
-        self.ids['tBytes'] = sourceMgr.register(ifName + ' bytes transmitted', unit='bytes')
-        self.ids['tPackets'] = sourceMgr.register(ifName + ' packets transmitted', unit='packets')
+        self.ids['rBytes'] = sourceMgr.register(self.targetIf + ' bytes received', unit='bytes')
+        self.ids['rPackets'] = sourceMgr.register(self.targetIf + ' packets received', unit='packets')
+        self.ids['tBytes'] = sourceMgr.register(self.targetIf + ' bytes transmitted', unit='bytes')
+        self.ids['tPackets'] = sourceMgr.register(self.targetIf + ' packets transmitted', unit='packets')
 
         EventMgr.startTimer(100*1000, self.onTimer)
 

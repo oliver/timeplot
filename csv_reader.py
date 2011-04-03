@@ -5,9 +5,9 @@ from base_reader import InputReader
 from event import EventMgr
 
 class CsvReader (InputReader):
-    def __init__ (self, sourceMgr, store, filename):
+    def __init__ (self, sourceMgr, store, file):
         InputReader.__init__(self, store)
-        self.filename = filename
+        self.filename = file
 
         self.fd = open(self.filename, 'rb')
         sampleText = self.fd.read(1024)
