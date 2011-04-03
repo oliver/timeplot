@@ -6,6 +6,7 @@ import math
 
 from config import Cfg
 from event import EventMgr
+from loader import ReaderLoader
 from base_reader import InputReader
 from sdl_output import SdlOutput
 
@@ -165,8 +166,16 @@ if __name__ == '__main__':
     for filename in args:
         reader = CsvReader(sourceMgr, store, filename)
 
+    loader = ReaderLoader()
+
     for r in Cfg.readers:
-        if r.type == 'CsvReader':
-            reader = CsvReader(sourceMgr, store, r.file)
+        classObj = loader.load(r.type)
+        if not(classObj):
+            print "unknown reader type '%s'" % r.type
+        else:
+            try:
+                reader = classObj(sourceMgr, store)
+            except Exception, e:
+                print "could not load reader '%s' (%s)" % (r.type, e)
 
     widget.run()
