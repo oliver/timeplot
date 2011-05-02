@@ -21,6 +21,7 @@ class CsvReader (InputReader):
             # read header fields
             lines = sampleText.splitlines()[:2]
             dictReader = csv.DictReader(lines, dialect=dialect)
+            dictReader.next()
             self.id = sourceMgr.register('%s (%s)' % (dictReader.fieldnames[1], self.filename))
             del dictReader
         else:
