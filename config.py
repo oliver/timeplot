@@ -8,7 +8,10 @@ print Cfg.ui_settings.show_all # prints current value of this option
 Cfg.ui_settings.show_all = True # automatically writes config to JSON file
 """
 
-import json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 _defaultSettings = """
 {
