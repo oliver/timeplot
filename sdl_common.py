@@ -25,7 +25,10 @@ class SdlStyle:
 
 
     def graphColor (id):
-        import hashlib
+        try:
+            import hashlib
+        except ImportError:
+            import md5 as hashlib
         h = hashlib.md5(str(id))
         return tuple([ ord(x) for x in h.digest()[:3] ])
 
