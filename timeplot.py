@@ -9,6 +9,7 @@ from event import EventMgr
 from loader import ReaderLoader
 from base_reader import InputReader
 from sdl_output import SdlOutput
+#from qt_output import QtOutput
 
 from test_reader import *
 from sys_linux_reader import *
@@ -143,6 +144,7 @@ if __name__ == '__main__':
 
     # start GUI
     widget = SdlOutput(None, store, sourceMgr)
+    #widget = QtOutput(store, sourceMgr)
     EventMgr.setImpl(widget)
 
     for filename in args:
