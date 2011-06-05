@@ -21,6 +21,11 @@ class BaseOutput:
 
 
     def startTimer (self, usec, callback):
+        """
+        Starts a periodic timer.
+        Every <usec> microseconds, the specified callback function is called.
+        If the function returns False, the timer is stopped.
+        """
         raise Exception("not implemented")
 
     def watchFd (self, fd, callback):
