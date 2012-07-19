@@ -18,6 +18,7 @@ class SdlOutput(BaseOutput):
         self.lastId = pygame.USEREVENT
         self.timers = {}
         self.widgets = []
+        self.windowState = 0
 
         # TODO: move these into model:
         self.showAll = Cfg.ui_settings.show_all
@@ -235,6 +236,8 @@ class SdlOutput(BaseOutput):
                         self.start = self.panStartTime + diff
                         self.end = self.start + self.displayedSeconds
                         self.scrollbar.setPos(self.start)
+                elif event.type == pygame.ACTIVEEVENT:
+                    self.windowState = event.state
                 else:
                     if self.timers.has_key(event.type):
                         cb = self.timers[event.type]
@@ -257,6 +260,11 @@ class SdlOutput(BaseOutput):
                 self.lblCurrent.set(currentPos)
             else:
                 self.lblCurrent.set("")
+
+            if self.windowState == 6:
+                # don't do any redraws if window is iconified
+                continue
+                pass
 
             self.screen.fill(SdlStyle.bgColor)
 
