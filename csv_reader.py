@@ -8,6 +8,7 @@ class CsvReader (InputReader):
     def __init__ (self, sourceMgr, store, file):
         InputReader.__init__(self, store)
         self.filename = file
+        self.ids = []
 
         self.fd = open(self.filename, 'rb')
         sampleText = self.fd.read(1024*20)
@@ -22,10 +23,11 @@ class CsvReader (InputReader):
             lines = sampleText.splitlines()[:2]
             dictReader = csv.DictReader(lines, dialect=dialect)
             dictReader.next()
-            self.id = sourceMgr.register('%s (%s)' % (dictReader.fieldnames[1], self.filename))
+            for name in dictReader.fieldnames[1:]:
+                self.ids.append( sourceMgr.register('%s (%s)' % (name, self.filename)) )
             del dictReader
         else:
-            self.id = sourceMgr.register(self.filename)
+            self.ids.append( sourceMgr.register(self.filename) )
 
         self.readAvailableData()
 
@@ -44,5 +46,9 @@ class CsvReader (InputReader):
             except StopIteration:
                 break
             t = float(r[0])
-            v = float(r[1])
-            self.store.update( (self.id, t, v) )
+
+            i = 0
+            for rawValue in r[1:]:
+                v = float(rawValue)
+                self.store.update( (self.ids[i], t, v) )
+                i+=1
