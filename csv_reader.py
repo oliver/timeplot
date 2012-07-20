@@ -1,5 +1,7 @@
 
 import csv
+import time
+import dateutil.parser
 
 from base_reader import InputReader
 from event import EventMgr
@@ -9,6 +11,7 @@ class CsvReader (InputReader):
         InputReader.__init__(self, store)
         self.filename = file
         self.ids = []
+        self.timeParser = None
 
         self.fd = open(self.filename, 'rb')
         sampleText = self.fd.read(1024*20)
@@ -45,10 +48,29 @@ class CsvReader (InputReader):
                 r = self.reader.next()
             except StopIteration:
                 break
-            t = float(r[0])
+
+            if self.timeParser is None:
+                self.timeParser = self._detectTimeType(r[0])
+            t = self.timeParser(r[0])
 
             i = 0
             for rawValue in r[1:]:
                 v = float(rawValue)
                 self.store.update( (self.ids[i], t, v) )
                 i+=1
+
+
+    def _parseTimeString (self, s):
+        dt = dateutil.parser.parse(s, fuzzy=True)
+        return time.mktime(dt.timetuple())
+
+    def _detectTimeType (self, s):
+        for parserFunc in [ float, self._parseTimeString ]:
+            try:
+                result = parserFunc(s)
+            except:
+                continue
+            else:
+                return parserFunc
+        return None
+
