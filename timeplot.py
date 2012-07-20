@@ -3,6 +3,7 @@
 
 import sys
 import math
+import getopt
 
 from config import Cfg
 from event import EventMgr
@@ -131,12 +132,34 @@ class DataStore:
         return result
 
 
+def Usage ():
+    print "%s [-c <config file>] [--csv <CSV file>]" % sys.argv[0]
+
+
 if __name__ == '__main__':
-    args = sys.argv
-    args.pop(0)
-    if len(args) >= 2 and args[0] == '-c':
-        Cfg.loadFile(args[1])
-        args.pop(0); args.pop(0)
+    configFile = None
+    csvFiles = []
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'c:', ['cfg=', 'csv='])
+    except getopt.GetoptError, err:
+        print str(err)
+        Usage()
+        sys.exit(1)
+    for o, a in opts:
+        if o == '-c' or o == '--cfg':
+            configFile = a
+        elif o == '--csv':
+            csvFiles.append(a)
+        else:
+            raise Exception('unknown option "%s"' % o)
+
+    if not(configFile) and not(csvFiles):
+        Usage()
+        sys.exit(1)
+
+    if configFile:
+        Cfg.loadFile(configFile)
 
     # set up basic objects
     store = DataStore()
@@ -147,7 +170,7 @@ if __name__ == '__main__':
     #widget = QtOutput(store, sourceMgr)
     EventMgr.setImpl(widget)
 
-    for filename in args:
+    for filename in csvFiles:
         reader = CsvReader(sourceMgr, store, filename)
 
     loader = ReaderLoader()
