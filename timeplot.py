@@ -9,8 +9,6 @@ from config import Cfg
 from event import EventMgr
 from loader import ReaderLoader
 from base_reader import InputReader
-from sdl_output import SdlOutput
-#from qt_output import QtOutput
 
 from test_reader import *
 from sys_linux_reader import *
@@ -133,15 +131,16 @@ class DataStore:
 
 
 def Usage ():
-    print "%s [-c <config file>] [--csv <CSV file>]" % sys.argv[0]
+    print "%s [-c <config file>] [--csv <CSV file>] [--ui <sdl|qt>]" % sys.argv[0]
 
 
 if __name__ == '__main__':
     configFile = None
     csvFiles = []
+    uiType = 'sdl'
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'c:', ['cfg=', 'csv='])
+        opts, args = getopt.getopt(sys.argv[1:], 'c:', ['cfg=', 'csv=', 'ui='])
     except getopt.GetoptError, err:
         print str(err)
         Usage()
@@ -151,6 +150,8 @@ if __name__ == '__main__':
             configFile = a
         elif o == '--csv':
             csvFiles.append(a)
+        elif o == '--ui':
+            uiType = a
         else:
             raise Exception('unknown option "%s"' % o)
 
@@ -166,8 +167,17 @@ if __name__ == '__main__':
     sourceMgr = SourceManager(store)
 
     # start GUI
-    widget = SdlOutput(None, store, sourceMgr)
-    #widget = QtOutput(store, sourceMgr)
+    if uiType == 'sdl':
+        from sdl_output import SdlOutput
+        widget = SdlOutput(None, store, sourceMgr)
+    elif uiType == 'qt':
+        from qt_output import QtOutput
+        widget = QtOutput(store, sourceMgr)
+    else:
+        print "invalid UI type '%s'" % uiType
+        Usage()
+        sys.exit(1)
+
     EventMgr.setImpl(widget)
 
     for filename in csvFiles:
