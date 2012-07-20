@@ -10,7 +10,7 @@ class CsvReader (InputReader):
         self.filename = file
 
         self.fd = open(self.filename, 'rb')
-        sampleText = self.fd.read(1024)
+        sampleText = self.fd.read(1024*20)
         dialect = csv.Sniffer().sniff(sampleText)
         self.fd.seek(0)
 
