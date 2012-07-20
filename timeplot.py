@@ -10,8 +10,6 @@ from event import EventMgr
 from loader import ReaderLoader
 from base_reader import InputReader
 
-from test_reader import *
-from sys_linux_reader import *
 from csv_reader import *
 
 from debug import DBG
