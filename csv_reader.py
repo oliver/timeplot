@@ -10,8 +10,10 @@ class CsvReader (InputReader):
     def __init__ (self, sourceMgr, store, file):
         InputReader.__init__(self, store)
         self.filename = file
+        self.lineNo = 0
         self.ids = []
         self.timeParser = None
+        self.columnParsers = []
 
         self.fd = open(self.filename, 'rb')
         sampleText = self.fd.read(1024*20)
@@ -21,6 +23,7 @@ class CsvReader (InputReader):
         self.reader = csv.reader(self.fd, dialect)
         if csv.Sniffer().has_header(sampleText):
             self.reader.next()
+            self.lineNo+=1
 
             # read header fields
             lines = sampleText.splitlines()[:2]
@@ -48,6 +51,7 @@ class CsvReader (InputReader):
                 r = self.reader.next()
             except StopIteration:
                 break
+            self.lineNo+=1
 
             if self.timeParser is None:
                 self.timeParser = self._detectTimeType(r[0])
@@ -55,11 +59,30 @@ class CsvReader (InputReader):
 
             i = 0
             for rawValue in r[1:]:
-                v = float(rawValue)
+                if len(self.columnParsers) <= i:
+                    # initialize list of possible parsers for this column:
+                    self.columnParsers.append( [float, self._parseFloatComma] )
+
+                # try all available parser functions, and remove those that fail:
+                parsers = self.columnParsers[i][:]
+                assert(len(parsers) > 0)
+                for parser in parsers:
+                    try:
+                        v = parser(rawValue)
+                    except Exception, e:
+                        if len(self.columnParsers[i]) <= 1:
+                            raise Exception("failed to parse CSV value '%s' (line %d, table column %d) as '%s': %s" % (
+                                rawValue, self.lineNo, i+2, parser, e) )
+                        else:
+                            self.columnParsers[i].remove(parser)
+                    else:
+                        break
+
                 self.store.update( (self.ids[i], t, v) )
                 i+=1
 
 
+    # time parsing
     def _parseTimeString (self, s):
         dt = dateutil.parser.parse(s, fuzzy=True)
         return time.mktime(dt.timetuple())
@@ -73,4 +96,10 @@ class CsvReader (InputReader):
             else:
                 return parserFunc
         return None
+
+
+    # value parsing
+    def _parseFloatComma (self, s):
+        "parse float value with comma instead of dot"
+        return float(s.replace(',', '.'))
 
