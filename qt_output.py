@@ -28,6 +28,12 @@ class QtOutput(BaseOutput):
         self.win = MainWindow()
         self.win.plotter.store = store
 
+        self.win.connect(self.win.actionZoomIn, QtCore.SIGNAL('activated()'), lambda: self.onZoom(2))
+        self.win.connect(self.win.actionZoomOut, QtCore.SIGNAL('activated()'), lambda: self.onZoom(0.5))
+
+    def onZoom (self, factor):
+        self.win.plotter.visibleSeconds /= factor
+
     def startTimer (self, usec, callback):
         timer = QtCore.QTimer()
         self.timers.append(timer)
@@ -42,10 +48,10 @@ class QtOutput(BaseOutput):
         if availStart is not None:
             stayAtEnd = (self.win.hscrollPlotter.value() == self.win.hscrollPlotter.maximum())
 
-            maxVal = (availEnd - self.win.plotter.displayedSeconds - availStart) * 1000
+            maxVal = (availEnd - self.win.plotter.visibleSeconds - availStart) * 1000
             self.win.hscrollPlotter.setRange(0, maxVal)
 
-            self.win.hscrollPlotter.setPageStep(self.win.plotter.displayedSeconds * 1000)
+            self.win.hscrollPlotter.setPageStep(self.win.plotter.visibleSeconds * 1000)
             self.win.hscrollPlotter.setSingleStep(1000)
             
             if stayAtEnd:

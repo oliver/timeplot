@@ -16,8 +16,7 @@ class Plotter(QtGui.QWidget):
         #QtOpenGL.QGLWidget.__init__(self, parent)
         self.store = store
 
-        self.displayedSeconds = 10
-        
+        self.visibleSeconds = 10
         self.start = None
 
     def _xToScreen (self, px):
@@ -41,7 +40,7 @@ class Plotter(QtGui.QWidget):
 
         if self.start is None:
             self.start = availStart
-        self.end = self.start + self.displayedSeconds
+        self.end = self.start + self.visibleSeconds
 
         if self.end <= self.start:
             self.start-=1
