@@ -53,12 +53,11 @@ class QtOutput(BaseOutput):
 
             self.win.hscrollPlotter.setPageStep(self.win.plotter.visibleSeconds * 1000)
             self.win.hscrollPlotter.setSingleStep(1000)
-            
+
             if stayAtEnd:
                 self.win.hscrollPlotter.setValue(self.win.hscrollPlotter.maximum())
 
             self.win.plotter.start = ((self.win.hscrollPlotter.value() / 1000.0) + availStart)
-            
 
     def run (self):
         redrawTimer = QtCore.QTimer()

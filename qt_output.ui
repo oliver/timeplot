@@ -18,13 +18,6 @@
     <item row="0" column="0">
      <widget class="Plotter" name="plotter" native="true"/>
     </item>
-    <item row="2" column="0">
-     <widget class="QCheckBox" name="checkBox">
-      <property name="text">
-       <string>CheckBox</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QScrollBar" name="hscrollPlotter">
       <property name="orientation">
@@ -62,9 +55,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionShowAll"/>
-   <addaction name="actionUpdate"/>
-   <addaction name="separator"/>
    <addaction name="actionZoomIn"/>
    <addaction name="actionZoomOut"/>
   </widget>
@@ -83,22 +73,6 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
-   </property>
-  </action>
-  <action name="actionUpdate">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Update</string>
-   </property>
-  </action>
-  <action name="actionShowAll">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Show All</string>
    </property>
   </action>
   <action name="actionZoomIn">
