@@ -18,10 +18,17 @@
     <item row="0" column="0">
      <widget class="Plotter" name="plotter" native="true"/>
     </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QCheckBox" name="checkBox">
       <property name="text">
        <string>CheckBox</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QScrollBar" name="hscrollPlotter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>
@@ -33,7 +40,7 @@
      <x>0</x>
      <y>0</y>
      <width>858</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbc">

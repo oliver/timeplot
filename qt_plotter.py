@@ -16,9 +16,9 @@ class Plotter(QtGui.QWidget):
         #QtOpenGL.QGLWidget.__init__(self, parent)
         self.store = store
 
-        self.showAll = False
-        self.doUpdate = True
         self.displayedSeconds = 10
+        
+        self.start = None
 
     def _xToScreen (self, px):
         duration = self.end - self.start
@@ -39,15 +39,9 @@ class Plotter(QtGui.QWidget):
         if availEnd is None:
             availEnd = nowTime
 
-        if self.showAll:
+        if self.start is None:
             self.start = availStart
-            self.end = availEnd
-        elif self.doUpdate:
-            self.end = nowTime
-            self.start = self.end - self.displayedSeconds
-            #self.scrollbar.setPos(self.start)
-        else:
-            pass
+        self.end = self.start + self.displayedSeconds
 
         if self.end <= self.start:
             self.start-=1
