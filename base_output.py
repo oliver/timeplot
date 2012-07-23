@@ -3,6 +3,24 @@ class BaseOutput:
     def __init__ (self, model):
         self.model = model
 
+    def startTimer (self, usec, callback):
+        """
+        Starts a periodic timer.
+        Every <usec> microseconds, the specified callback function is called.
+        If the function returns False, the timer is stopped.
+        """
+        raise Exception("not implemented")
+
+    def watchFd (self, fd, callback):
+        raise Exception("not implemented")
+
+    def onUpdate (self):
+        pass
+
+
+class BasePlotter:
+    def __init__ (self):
+
         # create list of possible X grid intervals:
         self.floatFactorLength = 3
         self.floatFactor = 10 ** self.floatFactorLength
@@ -18,22 +36,6 @@ class BaseOutput:
         for hour in [1, 3, 6, 12, 24, 24*2, 24*7, 24*30, 24*30*2, 24*30*6, 24*365]:
             self._xIntervals.append(hour * 60*60 * self.floatFactor)
         self._xIntervals.sort()
-
-
-    def startTimer (self, usec, callback):
-        """
-        Starts a periodic timer.
-        Every <usec> microseconds, the specified callback function is called.
-        If the function returns False, the timer is stopped.
-        """
-        raise Exception("not implemented")
-
-    def watchFd (self, fd, callback):
-        raise Exception("not implemented")
-
-
-    def onUpdate (self):
-        pass
 
     def _roundXInterval (self, target):
         bestInterval = self._xIntervals[0]

@@ -27,9 +27,6 @@ class QtOutput(BaseOutput):
         self.app = QtGui.QApplication(sys.argv)
         self.win = MainWindow()
         self.win.plotter.store = store
-        self.win.plotter.baseOutput = self
-        self.win.plotter.floatFactor = self.floatFactor
-        self.win.plotter.floatFactorLength = self.floatFactorLength
 
         self.win.connect(self.win.actionZoomIn, QtCore.SIGNAL('activated()'), lambda: self.onZoom(2))
         self.win.connect(self.win.actionZoomOut, QtCore.SIGNAL('activated()'), lambda: self.onZoom(0.5))

@@ -9,9 +9,10 @@ from sdl_common import *
 from sdl_widgets import *
 
 
-class SdlOutput(BaseOutput):
+class SdlOutput(BaseOutput, BasePlotter):
     def __init__ (self, model, store, sourceMgr):
         BaseOutput.__init__(self, model)
+        BasePlotter.__init__(self)
         self.store = store
         self.sourceMgr = sourceMgr
 

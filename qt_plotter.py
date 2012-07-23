@@ -3,16 +3,19 @@ import sys
 import time
 import datetime
 
+from base_output import BasePlotter
+
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
 
 #from PyQt4 import QtOpenGL
 
-class Plotter(QtGui.QWidget):
+class Plotter(QtGui.QWidget, BasePlotter):
 #class Plotter(QtOpenGL.QGLWidget):
     def __init__ (self, parent, store = None):
         QtGui.QWidget.__init__(self, parent)
+        BasePlotter.__init__(self)
         #QtOpenGL.QGLWidget.__init__(self, parent)
         self.store = store
 
@@ -55,7 +58,7 @@ class Plotter(QtGui.QWidget):
 
 
         # draw grid
-        (firstMark, lastMark, xInterval, xTextInterval) = self.baseOutput.calcXMarkers(self.start, self.end)
+        (firstMark, lastMark, xInterval, xTextInterval) = self.calcXMarkers(self.start, self.end)
 
         showDate = False
         startDate = datetime.datetime.fromtimestamp(self.start)
