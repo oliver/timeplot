@@ -11,16 +11,29 @@ from PyQt4 import QtCore
 
 #from PyQt4 import QtOpenGL
 
+def rangesOverlap (r1, r2):
+    if r1[1] < r2[0] or r1[0] > r2[1]:
+        return False
+    return True
+
+
 class Plotter(QtGui.QWidget, BasePlotter):
 #class Plotter(QtOpenGL.QGLWidget):
-    def __init__ (self, parent, store = None):
+    def __init__ (self, parent):
         QtGui.QWidget.__init__(self, parent)
         BasePlotter.__init__(self)
         #QtOpenGL.QGLWidget.__init__(self, parent)
-        self.store = store
 
         self.visibleSeconds = 10
         self.start = None
+
+    def init (self, store):
+        self.store = store
+        self.store.registerUpdateHandler(self.onDataChanged)
+
+    def onDataChanged (self, dirtyStart, dirtyEnd):
+        if self.start is None or rangesOverlap( (self.start, self.start+self.visibleSeconds), (dirtyStart, dirtyEnd) ):
+            self.update()
 
     def _xToScreen (self, px):
         duration = self.end - self.start

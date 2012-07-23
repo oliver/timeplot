@@ -4,6 +4,7 @@
 import sys
 import math
 import getopt
+import time
 
 from config import Cfg
 from event import EventMgr
@@ -42,19 +43,51 @@ class DataStore:
         self.oldest = None
         self.newest = None
 
+        self.reportingInterval = 0.05 # combine changes of N seconds into one update event
+        self.updateHandlers = []
+
+        self.lastUpdateEvent = 0
+        self.dirtyStart = None
+        self.dirtyEnd = None
+
     def onNewSource (self, id):
         assert(not(self.data.has_key(id)))
         self.data[id] = []
 
-    def update (self, tup):
-        (id, time, value) = tup
-        #print "data update from source '%s'" % id
-        self.data[id].append( (time, value) )
+    def registerUpdateHandler (self, handlerFunc):
+        self.updateHandlers.append(handlerFunc)
+        self.lastUpdateEvent = 0 # force flushing of current update events
 
-        if self.oldest is None or time < self.oldest:
-            self.oldest = time
-        if self.newest is None or time > self.newest:
-            self.newest = time
+    def update (self, tup):
+        (id, timestamp, value) = tup
+        #print "data update from source '%s'" % id
+        self.data[id].append( (timestamp, value) )
+
+        if self.oldest is None or timestamp < self.oldest:
+            self.oldest = timestamp
+        if self.newest is None or timestamp > self.newest:
+            self.newest = timestamp
+
+        if self.updateHandlers:
+            endTime = timestamp
+            if len(self.data[id]) == 1:
+                startTime = endTime
+            else:
+                startTime = self.data[id][-2][0]
+
+            if self.dirtyStart is None or startTime < self.dirtyStart:
+                self.dirtyStart = startTime
+            if self.dirtyEnd is None or endTime > self.dirtyEnd:
+                self.dirtyEnd = endTime
+
+            nowTime = time.time()
+            if self.lastUpdateEvent + self.reportingInterval < nowTime:
+                for func in self.updateHandlers:
+                    func(self.dirtyStart, self.dirtyEnd)
+
+                self.lastUpdateEvent = nowTime
+                self.dirtyStart = None
+                self.dirtyEnd = None
 
     def getRange (self):
         return (self.oldest, self.newest)
