@@ -32,7 +32,7 @@ class QtOutput(BaseOutput):
         self.win.connect(self.win.actionZoomOut, QtCore.SIGNAL('activated()'), lambda: self.onZoom(0.5))
 
     def onZoom (self, factor):
-        self.win.plotter.visibleSeconds /= factor
+        self.win.plotter.visibleSeconds /= float(factor)
 
     def startTimer (self, usec, callback):
         timer = QtCore.QTimer()
