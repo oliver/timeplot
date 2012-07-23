@@ -53,6 +53,49 @@ class Plotter(QtGui.QWidget):
 
         factorY = float(self.height()) / yRange
 
+
+        # draw grid
+        (firstMark, lastMark, xInterval, xTextInterval) = self.baseOutput.calcXMarkers(self.start, self.end)
+
+        showDate = False
+        startDate = datetime.datetime.fromtimestamp(self.start)
+        endDate = datetime.datetime.fromtimestamp(self.end)
+        if startDate.date() != endDate.date():
+            showDate = True
+
+        for tScaled in range(firstMark, lastMark, xInterval):
+            t = float(tScaled) / self.floatFactor
+            x = self._xToScreen(t)
+            if x < -100 or x > self.width()+100:
+                continue
+
+            p.drawLine(x, 0, x, self.height())
+
+            if tScaled % (xTextInterval) == 0:
+                if showDate:
+                    dateStr = time.strftime("%a, %Y-%m-%d", time.localtime(t))
+                else:
+                    dateStr = ''
+
+                timeStr = time.strftime("%H:%M:%S", time.localtime(t))
+                if tScaled % self.floatFactor != 0:
+                    fract = int(tScaled % self.floatFactor)
+                    formatString = "%0" + str(self.floatFactorLength) + "d"
+                    fractStr = formatString % fract
+                    fractStr = fractStr.rstrip('0')
+                    timeStr += "." + fractStr
+
+                timeStr += '\n' + dateStr
+                p.drawText(x-200, self.height()-50, 400, 50, QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom, timeStr)
+
+        for i in xrange(yMin, yMax, 10):
+            y = self.height() - ((i - yMin) * factorY)
+            #color = SdlStyle.axisColors[1]
+            #if i % 100 == 0:
+            #    color = SdlStyle.axisColors[0]
+            p.drawLine(0, y, self.width(), y)
+
+
         for id,l in allPoints.items():
             if not(l):
                 continue
