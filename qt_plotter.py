@@ -43,8 +43,6 @@ class Plotter(QtGui.QWidget, BasePlotter):
 
     def paintEvent (self, event):
         p = QtGui.QPainter(self)
-        pen = QtGui.QPen(QtGui.QColor('black'))
-        p.setPen(pen)
 
         nowTime = time.time()
 
@@ -71,6 +69,10 @@ class Plotter(QtGui.QWidget, BasePlotter):
 
 
         # draw grid
+        gridPen = QtGui.QPen(QtGui.QColor('silver'))
+        gridPenStrong = QtGui.QPen(QtGui.QColor('grey'))
+        p.setPen(gridPen)
+
         (firstMark, lastMark, xInterval, xTextInterval) = self.calcXMarkers(self.start, self.end)
 
         showDate = False
@@ -85,9 +87,14 @@ class Plotter(QtGui.QWidget, BasePlotter):
             if x < -100 or x > self.width()+100:
                 continue
 
+            drawText = (tScaled % (xTextInterval) == 0)
+
+            if drawText:
+                p.setPen(gridPenStrong)
+
             p.drawLine(x, 0, x, self.height())
 
-            if tScaled % (xTextInterval) == 0:
+            if drawText:
                 if showDate:
                     dateStr = time.strftime("%a, %Y-%m-%d", time.localtime(t))
                 else:
@@ -103,14 +110,20 @@ class Plotter(QtGui.QWidget, BasePlotter):
 
                 timeStr += '\n' + dateStr
                 p.drawText(x-200, self.height()-50, 400, 50, QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom, timeStr)
+                p.setPen(gridPen)
 
         for i in xrange(yMin, yMax, 10):
             y = self.height() - ((i - yMin) * factorY)
-            #color = SdlStyle.axisColors[1]
-            #if i % 100 == 0:
-            #    color = SdlStyle.axisColors[0]
+            drawStrongLine = (i % 100 == 0)
+            if drawStrongLine:
+                p.setPen(gridPenStrong)
             p.drawLine(0, y, self.width(), y)
+            if drawStrongLine:
+                p.setPen(gridPen)
 
+
+        plotPen = QtGui.QPen(QtGui.QColor('black'))
+        p.setPen(plotPen)
 
         for id,l in allPoints.items():
             if not(l):
