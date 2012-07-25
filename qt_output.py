@@ -1,6 +1,7 @@
 
 import sys
 import math
+import time
 from PyQt4 import QtGui
 from PyQt4 import QtCore
 
@@ -146,6 +147,9 @@ class QtOutput(BaseOutput):
         self.win.plotter.init(store)
 
         self.hScroll = QScrollbarLong(self.win.hscrollPlotter)
+        self.rangeLabel = QtGui.QLabel()
+        self.win.statusBar().addWidget(self.rangeLabel)
+        self.rangeLabel.show()
 
         self.win.connect(self.win.actionZoomIn, QtCore.SIGNAL('activated()'), lambda: self.onZoom(2))
         self.win.connect(self.win.actionZoomOut, QtCore.SIGNAL('activated()'), lambda: self.onZoom(0.5))
@@ -187,10 +191,33 @@ class QtOutput(BaseOutput):
             self.hScroll.setValue(math.ceil(availEnd - self.win.plotter.visibleSeconds))
             self.sbHandleValueChanged()
 
+        self.updateRangeLabel()
+
     def sbHandleValueChanged (self):
         "value has been changed"
         self.win.plotter.start = self.hScroll.value()
+        self.updateRangeLabel()
         self.win.plotter.update()
+
+
+    def updateRangeLabel (self):
+        if self.win.plotter.start is None:
+            return
+
+        startFloat = self.win.plotter.start
+        endFloat = self.win.plotter.start + self.win.plotter.visibleSeconds
+
+        startDate = QtCore.QDateTime.fromTime_t(int(startFloat))
+        startFract = startFloat - int(startFloat)
+        endDate  = QtCore.QDateTime.fromTime_t(int(endFloat))
+        endFract = endFloat - int(endFloat)
+
+        rangeText = u"displayed: %s%s - %s%s (%f s)" % (
+            startDate.toString(QtCore.Qt.ISODate), ("%.06f" % startFract)[1:],
+            endDate.toString(QtCore.Qt.ISODate), ("%.06f" % endFract)[1:],
+            self.win.plotter.visibleSeconds)
+
+        self.rangeLabel.setText(rangeText)
 
 
     def run (self):
