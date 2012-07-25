@@ -13,9 +13,11 @@ from qt_output_ui import Ui_TimePlotWindow
 
 class QScrollbarLong:
     "wrapper around QScrollbar, allowing to set a range > 2**32 (and also use float values)"
-    INTERNAL_MAX = 2**31
+    INTERNAL_MAX = int(2**31-1)
 
     def __init__ (self, realScrollbar):
+        assert isinstance(self.INTERNAL_MAX, int)
+        
         self.realScrollbar = realScrollbar
         self.mini = None
         self.maxi = None
@@ -89,11 +91,10 @@ class QScrollbarLong:
             stepFactor = int(numMaxSteps / numNecessarySteps)
             assert stepFactor >= 1
             numSteps = int(numNecessarySteps * stepFactor)
-            assert numSteps <= numMaxSteps, "numSteps (%d) must be less or equal to numMaxSteps (%d); numNecessarySteps=%d, stepFactor=%d" % (
-                numSteps, numMaxSteps, numNecessarySteps, stepFactor)
-            assert numSteps >= numNecessarySteps
 
-        assert numSteps < self.INTERNAL_MAX, "really small steps not supported yet"
+        assert numSteps < numMaxSteps, "numSteps (%d) must be less or equal to numMaxSteps (%d); numNecessarySteps=%d, stepFactor=%d" % (
+            numSteps, numMaxSteps, numNecessarySteps, stepFactor)
+        assert numSteps >= numNecessarySteps
 
         self.internalRange = numSteps
 
