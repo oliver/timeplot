@@ -145,12 +145,16 @@ class QtOutput(BaseOutput):
 
         self.app = QtGui.QApplication(sys.argv)
         self.win = MainWindow()
-        self.win.plotter.init(store)
 
         self.hScroll = QScrollbarLong(self.win.hscrollPlotter)
         self.rangeLabel = QtGui.QLabel()
         self.win.statusBar().addWidget(self.rangeLabel)
         self.rangeLabel.show()
+        positionLabel = QtGui.QLabel()
+        self.win.statusBar().addWidget(positionLabel)
+        positionLabel.show()
+
+        self.win.plotter.init(store, positionLabel)
 
         self.win.connect(self.win.actionZoomIn, QtCore.SIGNAL('activated()'), lambda: self.onZoom(2))
         self.win.connect(self.win.actionZoomOut, QtCore.SIGNAL('activated()'), lambda: self.onZoom(0.5))

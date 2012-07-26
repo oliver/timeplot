@@ -26,20 +26,40 @@ class Plotter(QtGui.QWidget, BasePlotter):
 
         self.visibleSeconds = 10
         self.start = None
+        self.end = None
 
-    def init (self, store):
+        self.setMouseTracking(True)
+
+    def init (self, store, positionLabel):
         self.store = store
+        self.positionLabel = positionLabel
+
         self.store.registerUpdateHandler(self.onDataChanged)
 
     def onDataChanged (self, dirtyStart, dirtyEnd):
         if self.start is None or rangesOverlap( (self.start, self.start+self.visibleSeconds), (dirtyStart, dirtyEnd) ):
             self.update()
 
+    def _xToPos (self, sx):
+        duration = self.end - self.start
+        factorX = float(self.width()) / duration
+        px = (sx / factorX) + self.start
+        return px
+
     def _xToScreen (self, px):
         duration = self.end - self.start
         factorX = float(self.width()) / duration
         sx = (px - self.start) * factorX
         return sx
+
+    def mouseMoveEvent (self, event):
+        mouseSeconds = self._xToPos(event.x())
+        mouseFract = mouseSeconds - int(mouseSeconds)
+        mouseDate  = QtCore.QDateTime.fromTime_t(int(mouseSeconds))
+
+        labelText = "mouse: %s%s" % (
+            mouseDate.toString(QtCore.Qt.ISODate), ("%.06f" % mouseFract)[1:] )
+        self.positionLabel.setText(labelText)
 
     def paintEvent (self, event):
         p = QtGui.QPainter(self)
