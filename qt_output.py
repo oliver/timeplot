@@ -13,7 +13,7 @@ from qt_output_ui import Ui_TimePlotWindow
 
 class QScrollbarLong:
     "wrapper around QScrollbar, allowing to set a range > 2**32 (and also use float values)"
-    INTERNAL_MAX = int(2**31-1)
+    INTERNAL_MAX = int(2**30)
 
     def __init__ (self, realScrollbar):
         assert isinstance(self.INTERNAL_MAX, int)
