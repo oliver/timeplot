@@ -26,14 +26,12 @@ class QScrollbarLong:
         self.internalRange = None
         self.internalPageStep = None
 
-        self._lastValue = 0
-
     def _lengthToInternal (self, externalValue):
         externalLength = self.pageStep + self.maxi - self.mini
         internalLength = self.internalPageStep + self.internalRange
 
         factor = float(internalLength) / externalLength
-        result = int(externalValue * factor)
+        result = int(round(externalValue * factor))
         assert result <= self.INTERNAL_MAX, "internal value (%d) must be < max (%d); factor: %f" % (
             result, self.INTERNAL_MAX, factor)
         assert isinstance(result, int), "internal value (%d) is not an int; factor: %f" % (
@@ -57,9 +55,6 @@ class QScrollbarLong:
         assert pageStep > 0
         assert singleStep > 0
 
-        if self.mini != self.maxi:
-            self._lastValue = self._posToExternal(self.realScrollbar.value())
-
         if maximum <= minimum:
             # special case: no scrolling possible
             self.mini = self.maxi = minimum
@@ -67,6 +62,10 @@ class QScrollbarLong:
             self.realScrollbar.setPageStep(1)
             self.realScrollbar.setSingleStep(1)
             return
+
+        oldValue = None
+        if self.mini != self.maxi:
+            oldValue = self._posToExternal(self.realScrollbar.value())
 
         self.mini = minimum
         self.maxi = maximum
@@ -85,12 +84,45 @@ class QScrollbarLong:
         assert pageStep <= length
         assert singleStep <= pageStep
 
-        # use smaller (finer-grained) steps internally, to allow finer-grained scrollbar sliding:
+        # Ideally, the internal scrollbar should be split into enough separate "steps"
+        # to represent the following three values without loss of precision:
+        # - singleStep size
+        # - current value set in the scrollbar (here: oldValue)
+        # - external scrollbar length
+        # So we need the greatest common divisor of these three values.
+
+        def greatestCommonDivisor (a, b):
+            while b:
+                (a, b) = (b, a % b)
+            return a
+
+        necessaryStepFactor1 = singleStep
+        necessaryStepFactor2 = greatestCommonDivisor(length, singleStep)
+        if oldValue is not None:
+            necessaryStepFactor3 = greatestCommonDivisor((oldValue - self.mini), necessaryStepFactor2)
+        else:
+            necessaryStepFactor3 = necessaryStepFactor2
+
+        # it's not always possible to satisfy all three conditions listed above;
+        # so this is an ordered list of "necessaryStepFactor" values (best factor first) which will be tried:
+        necessaryStepFactors = [necessaryStepFactor3, necessaryStepFactor2, necessaryStepFactor1]
+
+        # add some more "fallback" step factors which are somewhat compatible with the best ones:
+        for i in range(20):
+            necessaryStepFactors.append( necessaryStepFactors[-1] * 2.0 )
+
+        # try all step factors until one fits:
+        # (using suboptimal factors might lead to rounding problems the scrollbar value)
         numMaxSteps = self.INTERNAL_MAX
-        numNecessarySteps = math.ceil(float(length) / singleStep)
+        for necessaryStepFactor in necessaryStepFactors:
+            numNecessarySteps = math.ceil(float(length) / necessaryStepFactor)
+            if numNecessarySteps <= numMaxSteps:
+                break
 
         if numNecessarySteps > numMaxSteps:
-            assert False, "too many steps necessary (%f)" % numNecessarySteps
+            #print "still too many steps necessary (%f); reducing to %d" % (numNecessarySteps, numMaxSteps)
+            numNecessarySteps = numMaxSteps
+            numSteps = numMaxSteps
         else:
             stepFactor = int(numMaxSteps / numNecessarySteps)
             assert stepFactor >= 1
@@ -100,7 +132,7 @@ class QScrollbarLong:
             numSteps, numMaxSteps, numNecessarySteps, stepFactor)
         assert numSteps >= numNecessarySteps
 
-        
+
         internalPageStepFraction = pageStep / float(pageStep + maximum - minimum)
         assert internalPageStepFraction <= 1.0
         assert internalPageStepFraction > 0.0
@@ -112,15 +144,14 @@ class QScrollbarLong:
         self.realScrollbar.setPageStep( self._lengthToInternal(pageStep) )
         self.realScrollbar.setSingleStep( self._lengthToInternal(singleStep) )
 
-        if self._lastValue is not None:
-            self.setValue(self._lastValue)
+        if oldValue is not None:
+            self.setValue(oldValue)
 
     def setValue (self, value):
         if value < self.mini:
             value = self.mini
         elif value > self.maxi:
             value = self.maxi
-        self._lastValue = value
         if not(self.mini == self.maxi):
             internalValue = self._posToInternal(value)
             self.realScrollbar.setValue(internalValue)
