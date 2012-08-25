@@ -214,6 +214,7 @@ class QtOutput(BaseOutput):
 
     def onZoom (self, factor):
         self.win.plotter.visibleSeconds /= float(factor)
+        self.win.plotter.setDisplayedRange(self.hScroll.value())
         self.sbUpdateRange()
         self.win.plotter.update()
 
@@ -248,7 +249,7 @@ class QtOutput(BaseOutput):
 
     def sbHandleValueChanged (self):
         "value has been changed"
-        self.win.plotter.start = self.hScroll.value()
+        self.win.plotter.setDisplayedRange(self.hScroll.value())
         self.updateRangeLabel()
         self.win.plotter.update()
 

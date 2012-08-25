@@ -24,12 +24,12 @@ class Plotter(QtGui.QWidget, BasePlotter):
         BasePlotter.__init__(self)
         #QtOpenGL.QGLWidget.__init__(self, parent)
 
-        self.visibleSeconds = 10
-        self.start = None
-        self.end = None
-
         self.minStart = time.time()
         self.maxEnd = self.minStart + 1
+
+        self.visibleSeconds = 10
+        self.start = self.minStart
+        self.end = self.start + self.visibleSeconds
 
         self._panning = False
         self._panStartX = None
@@ -47,6 +47,10 @@ class Plotter(QtGui.QWidget, BasePlotter):
         "set maximum time range that can be displayed"
         self.minStart = start
         self.maxEnd = end
+
+    def setDisplayedRange (self, start):
+        self.start = start
+        self.end = self.start + self.visibleSeconds
 
     def onDataChanged (self, dirtyStart, dirtyEnd):
         if self.start is None or rangesOverlap( (self.start, self.start+self.visibleSeconds), (dirtyStart, dirtyEnd) ):
@@ -112,13 +116,6 @@ class Plotter(QtGui.QWidget, BasePlotter):
 
     def paintEvent (self, event):
         p = QtGui.QPainter(self)
-
-        if self.start is None:
-            self.start = self.minStart
-        self.end = self.start + self.visibleSeconds
-
-        if self.end <= self.start:
-            self.start-=1
 
         allPoints = self.store.get(self.start, self.end)
 
