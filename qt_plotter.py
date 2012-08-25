@@ -31,6 +31,10 @@ class Plotter(QtGui.QWidget, BasePlotter):
         self.minStart = time.time()
         self.maxEnd = self.minStart + 1
 
+        self._panning = False
+        self._panStartX = None
+        self._panStartTime = None
+
         self.setMouseTracking(True)
 
     def init (self, store, positionLabel):
@@ -61,6 +65,24 @@ class Plotter(QtGui.QWidget, BasePlotter):
         return sx
 
     def mouseMoveEvent (self, event):
+        if self._panning:
+            diff = self._xToPos(self._panStartX) - self._xToPos(event.x())
+            newStart = self._panStartTime + diff
+            newEnd = newStart + self.visibleSeconds
+
+            if newEnd > self.maxEnd:
+                newEnd = self.maxEnd
+                newStart = newEnd - self.visibleSeconds
+            if newStart < self.minStart:
+                newStart = self.minStart
+                newEnd = newStart + self.visibleSeconds
+
+            if newStart != self.start or newEnd != self.end:
+                self.start = newStart
+                self.end = newEnd
+                self.update()
+                self.emit(QtCore.SIGNAL("startChanged()"))
+
         mouseSeconds = self._xToPos(event.x())
         mouseFract = mouseSeconds - int(mouseSeconds)
         mouseDate  = QtCore.QDateTime.fromTime_t(int(mouseSeconds))
@@ -68,6 +90,16 @@ class Plotter(QtGui.QWidget, BasePlotter):
         labelText = "mouse: %s%s" % (
             mouseDate.toString(QtCore.Qt.ISODate), ("%.06f" % mouseFract)[1:] )
         self.positionLabel.setText(labelText)
+
+    def mousePressEvent (self, event):
+        if not(self._panning) and (event.buttons() & QtCore.Qt.MidButton):
+            self._panning = True
+            self._panStartX = event.x()
+            self._panStartTime = self.start
+
+    def mouseReleaseEvent (self, event):
+        if self._panning and not(event.buttons() & QtCore.Qt.MidButton):
+            self._panning = False
 
     def paintEvent (self, event):
         p = QtGui.QPainter(self)

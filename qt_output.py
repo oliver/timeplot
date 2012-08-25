@@ -200,6 +200,7 @@ class QtOutput(BaseOutput):
         self.win.connect(self.win.actionZoomIn, QtCore.SIGNAL('activated()'), lambda: self.onZoom(2))
         self.win.connect(self.win.actionZoomOut, QtCore.SIGNAL('activated()'), lambda: self.onZoom(0.5))
         self.win.hscrollPlotter.connect(self.win.hscrollPlotter, QtCore.SIGNAL('valueChanged(int)'), lambda val: self.sbHandleValueChanged())
+        self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('startChanged()'), lambda: self.handlePlotterChanged())
 
     def onLoad (self):
         self.sbUpdateRange()
@@ -249,6 +250,9 @@ class QtOutput(BaseOutput):
         self.updateRangeLabel()
         self.win.plotter.update()
 
+    def handlePlotterChanged (self):
+        self.hScroll.setValue(self.win.plotter.start)
+        self.updateRangeLabel()
 
     def updateRangeLabel (self):
         if self.win.plotter.start is None:
