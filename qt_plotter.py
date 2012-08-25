@@ -101,6 +101,15 @@ class Plotter(QtGui.QWidget, BasePlotter):
         if self._panning and not(event.buttons() & QtCore.Qt.MidButton):
             self._panning = False
 
+    def wheelEvent (self, event):
+        numDegrees = event.delta() / 8
+        numSteps = numDegrees / 15.0 
+
+        if (event.modifiers() & QtCore.Qt.ShiftModifier):
+            self.emit(QtCore.SIGNAL("scrollPage(int)"), numSteps)
+        else:
+            self.emit(QtCore.SIGNAL("scrollStep(int)"), numSteps)
+
     def paintEvent (self, event):
         p = QtGui.QPainter(self)
 

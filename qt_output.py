@@ -201,6 +201,8 @@ class QtOutput(BaseOutput):
         self.win.connect(self.win.actionZoomOut, QtCore.SIGNAL('activated()'), lambda: self.onZoom(0.5))
         self.win.hscrollPlotter.connect(self.win.hscrollPlotter, QtCore.SIGNAL('valueChanged(int)'), lambda val: self.sbHandleValueChanged())
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('startChanged()'), lambda: self.handlePlotterChanged())
+        self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollStep(int)'), lambda numSteps: self.handlePlotterScrollStep(numSteps))
+        self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollPage(int)'), lambda numSteps: self.handlePlotterScrollPage(numSteps))
 
     def onLoad (self):
         self.sbUpdateRange()
@@ -253,6 +255,12 @@ class QtOutput(BaseOutput):
     def handlePlotterChanged (self):
         self.hScroll.setValue(self.win.plotter.start)
         self.updateRangeLabel()
+
+    def handlePlotterScrollStep (self, numSteps):
+        self.hScroll.setValue( self.hScroll.value() + ((self.win.plotter.visibleSeconds / 10.0) * numSteps * -1 * 3.0) )
+
+    def handlePlotterScrollPage (self, numSteps):
+        self.hScroll.setValue( self.hScroll.value() + (self.win.plotter.visibleSeconds * numSteps * -1) )
 
     def updateRangeLabel (self):
         if self.win.plotter.start is None:
