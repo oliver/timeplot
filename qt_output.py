@@ -228,8 +228,12 @@ class QtOutput(BaseOutput):
         if availStart is None:
             return
 
+        minStart = math.floor(availStart)
+        maxEnd = math.ceil(availEnd - self.win.plotter.visibleSeconds)
+        self.win.plotter.setMaxRange(minStart, maxEnd + self.win.plotter.visibleSeconds)
+
         stayAtEnd = self.hScroll.isAtMax()
-        self.hScroll.setRange(math.floor(availStart), math.ceil(availEnd - self.win.plotter.visibleSeconds),
+        self.hScroll.setRange(minStart, maxEnd,
             self.win.plotter.visibleSeconds, self.win.plotter.visibleSeconds / 10.0)
         self.currentRange = (availStart, availEnd)
 

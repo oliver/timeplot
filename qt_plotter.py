@@ -28,6 +28,9 @@ class Plotter(QtGui.QWidget, BasePlotter):
         self.start = None
         self.end = None
 
+        self.minStart = time.time()
+        self.maxEnd = self.minStart + 1
+
         self.setMouseTracking(True)
 
     def init (self, store, positionLabel):
@@ -35,6 +38,11 @@ class Plotter(QtGui.QWidget, BasePlotter):
         self.positionLabel = positionLabel
 
         self.store.registerUpdateHandler(self.onDataChanged)
+
+    def setMaxRange (self, start, end):
+        "set maximum time range that can be displayed"
+        self.minStart = start
+        self.maxEnd = end
 
     def onDataChanged (self, dirtyStart, dirtyEnd):
         if self.start is None or rangesOverlap( (self.start, self.start+self.visibleSeconds), (dirtyStart, dirtyEnd) ):
@@ -64,16 +72,8 @@ class Plotter(QtGui.QWidget, BasePlotter):
     def paintEvent (self, event):
         p = QtGui.QPainter(self)
 
-        nowTime = time.time()
-
-        (availStart, availEnd) = self.store.getRange()
-        if availStart is None:
-            availStart = nowTime
-        if availEnd is None:
-            availEnd = nowTime
-
         if self.start is None:
-            self.start = availStart
+            self.start = self.minStart
         self.end = self.start + self.visibleSeconds
 
         if self.end <= self.start:
