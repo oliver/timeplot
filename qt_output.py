@@ -203,6 +203,7 @@ class QtOutput(BaseOutput):
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('startChanged()'), lambda: self.handlePlotterChanged())
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollStep(int)'), lambda numSteps: self.handlePlotterScrollStep(numSteps))
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollPage(int)'), lambda numSteps: self.handlePlotterScrollPage(numSteps))
+        self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('zoomEvent(int)'), lambda numSteps: self.onZoom(2 ** numSteps))
 
     def onLoad (self):
         self.sbUpdateRange()
