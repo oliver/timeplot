@@ -214,12 +214,12 @@ class QtOutput(BaseOutput):
             self.sbUpdateRange()
 
     def onZoom (self, factor, centerTime = None):
-        if centerTime is not None:
-            diffOld = centerTime - self.hScroll.value()
-            diffNew = diffOld / float(factor)
-            newStart = centerTime - diffNew
-        else:
-            newStart = self.hScroll.value()
+        if centerTime is None:
+            centerTime = self.hScroll.value() + (self.win.plotter.visibleSeconds / 2.0)
+
+        diffOld = centerTime - self.hScroll.value()
+        diffNew = diffOld / float(factor)
+        newStart = centerTime - diffNew
 
         self.win.plotter.visibleSeconds /= float(factor)
         
