@@ -203,7 +203,7 @@ class QtOutput(BaseOutput):
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('startChanged()'), lambda: self.handlePlotterChanged())
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollStep(int)'), lambda numSteps: self.handlePlotterScrollStep(numSteps))
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollPage(int)'), lambda numSteps: self.handlePlotterScrollPage(numSteps))
-        self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('zoomEvent(int)'), lambda numSteps: self.onZoom(2 ** numSteps))
+        self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('zoomEvent(int,double)'), lambda numSteps, centerTime: self.onZoom(2 ** numSteps, centerTime))
 
     def onLoad (self):
         self.sbUpdateRange()
@@ -213,10 +213,25 @@ class QtOutput(BaseOutput):
         if newRange != self.currentRange:
             self.sbUpdateRange()
 
-    def onZoom (self, factor):
+    def onZoom (self, factor, centerTime = None):
+        if centerTime is not None:
+            diffOld = centerTime - self.hScroll.value()
+            diffNew = diffOld / float(factor)
+            newStart = centerTime - diffNew
+        else:
+            newStart = self.hScroll.value()
+
         self.win.plotter.visibleSeconds /= float(factor)
-        self.win.plotter.setDisplayedRange(self.hScroll.value())
+        
+        (availStart, availEnd) = self.store.getRange()
+        if newStart + self.win.plotter.visibleSeconds > availEnd:
+            newStart = availEnd - self.win.plotter.visibleSeconds
+        if newStart < availStart:
+            newStart = availStart
+
         self.sbUpdateRange()
+        self.hScroll.setValue(newStart)
+        self.win.plotter.setDisplayedRange(newStart)
         self.win.plotter.update()
 
     def startTimer (self, usec, callback):

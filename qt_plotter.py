@@ -110,7 +110,8 @@ class Plotter(QtGui.QWidget, BasePlotter):
         numSteps = numDegrees / 15.0 
 
         if (event.modifiers() & QtCore.Qt.ControlModifier):
-            self.emit(QtCore.SIGNAL("zoomEvent(int)"), numSteps)
+            zoomCenterTime = self._xToPos(event.x())
+            self.emit(QtCore.SIGNAL("zoomEvent(int,double)"), numSteps, zoomCenterTime)
         elif (event.modifiers() & QtCore.Qt.ShiftModifier):
             self.emit(QtCore.SIGNAL("scrollPage(int)"), numSteps)
         else:
