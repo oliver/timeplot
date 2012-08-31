@@ -100,10 +100,12 @@ class Plotter(QtGui.QWidget, BasePlotter):
             self._panning = True
             self._panStartX = event.x()
             self._panStartTime = self.start
+            self.setCursor(QtCore.Qt.ClosedHandCursor)
 
     def mouseReleaseEvent (self, event):
         if self._panning and not(event.buttons() & QtCore.Qt.MidButton):
             self._panning = False
+            self.unsetCursor()
 
     def wheelEvent (self, event):
         numDegrees = event.delta() / 8
