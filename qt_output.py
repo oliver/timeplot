@@ -7,6 +7,7 @@ from PyQt4 import QtCore
 
 #from config import Cfg
 from base_output import *
+from color_palette import *
 
 from qt_output_ui import Ui_TimePlotWindow
 
@@ -180,6 +181,8 @@ class QtOutput(BaseOutput):
         self.sourceMgr = sourceMgr
 
         self.timers = []
+
+        self.colors = ColorPalette()
         
         self.currentRange = None
         self.store.registerUpdateHandler(self.onDataChanged)
@@ -215,11 +218,14 @@ class QtOutput(BaseOutput):
         for (id, sourceName) in self.sourceMgr.sources():
             item = QtGui.QStandardItem(sourceName)
             item.setData(QtCore.QVariant(id), QtCore.Qt.UserRole)
+            plotColor = self.colors.getColor(id)
+            item.setData( QtCore.QVariant(QtGui.QColor(*plotColor)) , QtCore.Qt.DecorationRole)
             item.setCheckState(QtCore.Qt.Checked)
             item.setCheckable(True)
             item.setEditable(False)
             self.listModel.appendRow(item)
             self.win.plotter.setVisibility(id, True)
+            self.win.plotter.setColor(id, plotColor)
 
     def listItemChanged (self, item):
         plotId = item.data(QtCore.Qt.UserRole).toPyObject()

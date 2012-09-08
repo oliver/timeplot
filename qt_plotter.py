@@ -36,6 +36,7 @@ class Plotter(QtGui.QWidget, BasePlotter):
         self._panStartTime = None
 
         self._visiblePlots = {}
+        self._plotColors = {}
 
         self.setMouseTracking(True)
 
@@ -56,6 +57,9 @@ class Plotter(QtGui.QWidget, BasePlotter):
 
     def setVisibility (self, plotId, visible):
         self._visiblePlots[plotId] = bool(visible)
+
+    def setColor (self, plotId, colorTuple):
+        self._plotColors[plotId] = QtGui.QColor(*colorTuple)
 
     def onDataChanged (self, dirtyStart, dirtyEnd):
         if self.start is None or rangesOverlap( (self.start, self.start+self.visibleSeconds), (dirtyStart, dirtyEnd) ):
@@ -190,14 +194,18 @@ class Plotter(QtGui.QWidget, BasePlotter):
                 p.setPen(gridPen)
 
 
-        plotPen = QtGui.QPen(QtGui.QColor('black'))
-        p.setPen(plotPen)
-
         for id,l in allPoints.items():
             if not(l):
                 continue
             if not(self._visiblePlots.has_key(id)) or not(self._visiblePlots[id]):
                 continue
+
+            if self._plotColors.has_key(id):
+                plotColor = self._plotColors[id]
+            else:
+                plotColor = QtGui.QColor('black')
+            plotPen = QtGui.QPen(plotColor)
+            p.setPen(plotPen)
 
             if type(l[0][1]) == bool:
                 # event data
