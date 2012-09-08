@@ -195,6 +195,9 @@ class QtOutput(BaseOutput):
         self.win.statusBar().addWidget(positionLabel)
         positionLabel.show()
 
+        self.listModel = QtGui.QStandardItemModel()
+        self.win.lstSources.setModel(self.listModel)
+
         self.win.plotter.init(store, positionLabel)
 
         self.win.connect(self.win.actionZoomIn, QtCore.SIGNAL('activated()'), lambda: self.onZoom(2))
@@ -204,9 +207,24 @@ class QtOutput(BaseOutput):
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollStep(int)'), lambda numSteps: self.handlePlotterScrollStep(numSteps))
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('scrollPage(int)'), lambda numSteps: self.handlePlotterScrollPage(numSteps))
         self.win.plotter.connect(self.win.plotter, QtCore.SIGNAL('zoomEvent(int,double)'), lambda numSteps, centerTime: self.onZoom(2 ** numSteps, centerTime))
+        self.win.connect(self.listModel, QtCore.SIGNAL('itemChanged(QStandardItem*)'), lambda item: self.listItemChanged(item))
 
     def onLoad (self):
         self.sbUpdateRange()
+
+        for (id, sourceName) in self.sourceMgr.sources():
+            item = QtGui.QStandardItem(sourceName)
+            item.setData(QtCore.QVariant(id), QtCore.Qt.UserRole)
+            item.setCheckState(QtCore.Qt.Checked)
+            item.setCheckable(True)
+            item.setEditable(False)
+            self.listModel.appendRow(item)
+            self.win.plotter.setVisibility(id, True)
+
+    def listItemChanged (self, item):
+        plotId = item.data(QtCore.Qt.UserRole).toPyObject()
+        self.win.plotter.setVisibility(plotId, item.checkState() == QtCore.Qt.Checked)
+        self.win.plotter.update()
 
     def onDataChanged (self, start, end):
         newRange = self.store.getRange()

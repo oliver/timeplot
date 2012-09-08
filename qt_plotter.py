@@ -35,6 +35,8 @@ class Plotter(QtGui.QWidget, BasePlotter):
         self._panStartX = None
         self._panStartTime = None
 
+        self._visiblePlots = {}
+
         self.setMouseTracking(True)
 
     def init (self, store, positionLabel):
@@ -51,6 +53,9 @@ class Plotter(QtGui.QWidget, BasePlotter):
     def setDisplayedRange (self, start):
         self.start = start
         self.end = self.start + self.visibleSeconds
+
+    def setVisibility (self, plotId, visible):
+        self._visiblePlots[plotId] = bool(visible)
 
     def onDataChanged (self, dirtyStart, dirtyEnd):
         if self.start is None or rangesOverlap( (self.start, self.start+self.visibleSeconds), (dirtyStart, dirtyEnd) ):
@@ -191,6 +196,9 @@ class Plotter(QtGui.QWidget, BasePlotter):
         for id,l in allPoints.items():
             if not(l):
                 continue
+            if not(self._visiblePlots.has_key(id)) or not(self._visiblePlots[id]):
+                continue
+
             if type(l[0][1]) == bool:
                 # event data
                 pass
