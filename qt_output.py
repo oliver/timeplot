@@ -171,7 +171,18 @@ class MainWindow (QtGui.QMainWindow, Ui_TimePlotWindow):
     def __init__ (self):
         QtGui.QMainWindow.__init__(self)
 
+        self.winSettings = QtCore.QSettings("timeplot", "timeplot")
+
         self.setupUi(self)
+
+        self.restoreGeometry(self.winSettings.value("mainwin/geometry").toByteArray())
+        self.restoreState(self.winSettings.value("mainwin/state").toByteArray())
+
+    def closeEvent (self, event):
+        self.winSettings.setValue("mainwin/geometry", QtCore.QVariant(self.saveGeometry()))
+        self.winSettings.setValue("mainwin/state", QtCore.QVariant(self.saveState()))
+
+        QtGui.QMainWindow.closeEvent(self, event)
 
 
 class QtOutput(BaseOutput):
